@@ -1,0 +1,136 @@
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { auth } from '@/app/firebase/config'; // Import Firebase auth
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+
+export default function Header() {
+  const [isSignedIn, setIsSignedIn] = useState(false); // Track if the user is signed in
+  const [userEmail, setUserEmail] = useState(''); // Store the user's email
+  const [dropdownOpen, setDropdownOpen] = useState(false); // State for dropdown visibility
+  const router = useRouter();
+
+  useEffect(() => {
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsSignedIn(true);
+        setUserEmail(user.email || '');
+        sessionStorage.setItem('userEmail', user.email || '');
+      } else {
+        setIsSignedIn(false);
+        setUserEmail('');
+        sessionStorage.removeItem('userEmail');
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup the listener on unmount
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth); // Sign out the user
+      setDropdownOpen(false); // Close the dropdown
+      router.push('/sign-in'); // Redirect to the sign-in page
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev); // Toggle dropdown visibility
+  };
+
+  return (
+    <header className="bg-black text-white py-6 px-6 shadow-md">
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex-shrink-0">
+          <Link href="/">
+            <Image
+              src="/favicon.ico"
+              alt="Unlocking Minds Logo"
+              width={80}
+              height={80}
+              className="h-20 -mt-5 -mb-5"
+            />
+          </Link>
+        </div>
+
+        {/* Navigation Menu */}
+        <nav className="bg-white border-gray-200 dark:bg-gray-900">
+          <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+              {isSignedIn ? (
+                <>
+                  {/* User Dropdown */}
+                  <button
+                    type="button"
+                    className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                    id="user-menu-button"
+                    aria-expanded={dropdownOpen}
+                    onClick={toggleDropdown}
+                  >
+                    <span className="sr-only">Open user menu</span>
+                    <img
+                      className="w-8 h-8 rounded-full"
+                      src="/docs/images/people/profile-picture-3.jpg"
+                      alt="user photo"
+                    />
+                  </button>
+                  <div
+                    className={`z-50 ${dropdownOpen ? 'block' : 'hidden'} my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
+                    id="user-dropdown"
+                  >
+                    <div className="px-4 py-3">
+                      <span className="block text-sm text-gray-900 dark:text-white">
+                        {userEmail}
+                      </span>
+                    </div>
+                    <ul className="py-2" aria-labelledby="user-menu-button">
+                      <li>
+                        <Link
+                          href="/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        >
+                          Dashboard
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/settings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        >
+                          Settings
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={handleSignOut}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                        >
+                          Sign out
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                // Sign In Button
+                <Link
+                  href="/sign-in"
+                  className="bg-blue-600 hover:bg-blue-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+  );
+}
