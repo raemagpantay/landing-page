@@ -9,15 +9,15 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
         {/* Logo centered in the footer */}
         <div className="mb-2">
-          <Link href="/">
+            <Link href="/">
             <Image
-              src="/logo.png" // Path to your logo in the public folder
+              src="/favicon.ico" // Path to your favicon in the public folder
               alt="Cerebral Enigma Logo"
               width={64} // Adjust the width of the logo (16 * 4 = 64px)
               height={64} // Adjust the height of the logo (16 * 4 = 64px)
               className="h-16" // Optional: Add custom styles
             />
-          </Link>
+            </Link>
         </div>
 
         {/* Social and Links */}

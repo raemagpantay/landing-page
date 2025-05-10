@@ -45,7 +45,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-black text-white py-6 px-6 shadow-md">
+    <header className="bg-transparent text-white py-6 px-6 shadow-md">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
@@ -61,19 +61,19 @@ export default function Header() {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="bg-white border-gray-200 dark:bg-gray-900">
+        <nav className="bg-transparent">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
               {isSignedIn ? (
                 <>
                   {/* User Dropdown */}
-                    <button
+                  <button
                     type="button"
                     className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                     id="user-menu-button"
                     aria-expanded={dropdownOpen}
                     onClick={toggleDropdown}
-                    >
+                  >
                     <span className="sr-only">Open user menu</span>
                     <svg
                       className="w-8 h-8 rounded-full"
@@ -83,7 +83,7 @@ export default function Header() {
                     >
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                     </svg>
-                    </button>
+                  </button>
                   <div
                     className={`z-50 ${dropdownOpen ? 'block' : 'hidden'} my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
                     id="user-dropdown"
