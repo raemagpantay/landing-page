@@ -29,7 +29,7 @@ export default function About() {
           </div>
           <div className="md:w-1/2 flex justify-center">
             <Image
-              src="/images/project-management.jpg"
+              src="#"
               alt="Project Management"
               width={224}
               height={224}
@@ -48,7 +48,7 @@ export default function About() {
           </div>
           <div className="md:w-1/2 flex justify-center">
             <Image
-              src="/images/designer.jpg"
+              src="#"
               alt="Designer"
               width={224}
               height={224}
@@ -67,7 +67,7 @@ export default function About() {
           </div>
           <div className="md:w-1/2 flex justify-center">
             <Image
-              src="/images/documentation.jpg"
+              src="#"
               alt="Documentation"
               width={224}
               height={224}
@@ -86,7 +86,7 @@ export default function About() {
           </div>
           <div className="md:w-1/2 flex justify-center">
             <Image
-              src="/images/programmer.jpg"
+              src="#"
               alt="Programmer"
               width={224}
               height={224}
