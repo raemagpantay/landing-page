@@ -29,18 +29,26 @@ export default function AdminDashboard() {
     fetchCurrentFile();
   }, []);
 
-   const handleDelete = async () => {
+  const handleDelete = async () => {
     try {
       setStatus('Deleting file...');
-      const deleteRes = await fetch('/api/Delete', { method: 'DELETE' });
-      
+      const deleteRes = await fetch('/api/Delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName: currentFile }), // Pass the file name dynamically
+      });
+  
       if (deleteRes.ok) {
         setCurrentFile(null);
         setStatus('✅ File deleted successfully.');
       } else {
-        setStatus('❌ Failed to delete the file.');
+        const errorData = await deleteRes.json();
+        setStatus(`❌ Failed to delete the file: ${errorData.error}`);
       }
-    } catch {
+    } catch (error) {
+      console.error('Error deleting file:', error);
       setStatus('❌ An error occurred during deletion.');
     }
   };
