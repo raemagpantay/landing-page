@@ -54,6 +54,7 @@ export default function GameShowcase() {
       {/* Hero Section */}
       <section className="hero-section min-h-screen text-white px-6 py-20 flex flex-col items-center text-center">
   <motion.div
+  style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
     initial={{ opacity: 0, y: -30 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8 }}
