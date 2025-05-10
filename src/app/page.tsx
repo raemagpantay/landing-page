@@ -51,82 +51,86 @@ export default function GameShowcase() {
       <Header />
 
       {/* Hero Section */}
-      <section className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-6 py-20 flex flex-col items-center text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-3xl"
+      <section
+  className="min-h-screen bg-cover bg-center text-white px-6 py-20 flex flex-col items-center text-center"
+  style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+>
+  <motion.div
+    initial={{ opacity: 0, y: -30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="max-w-3xl bg-black bg-opacity-50 p-8 rounded-lg"
+  >
+    <h1 className="text-5xl md:text-6xl font-bold mb-6">
+      <span className="text-blue-500">PLANETARY DEEP SEA SURVIVAL</span>
+    </h1>
+    <p className="text-xl md:text-2xl text-gray-300 mb-8">
+      Dive into the depths and explore the mysteries of the ocean.
+    </p>
+
+    {loading ? (
+      <button
+        disabled
+        className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
+      >
+        Loading authentication...
+      </button>
+    ) : user ? (
+      <>
+        {isLoading ? (
+          <button
+            disabled
+            className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
+          >
+            Loading game...
+          </button>
+        ) : currentFile ? (
+          <a
+            href={`/uploads/${currentFile}`}
+            download
+            className="bg-blue-600 hover:bg-blue-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
+          >
+            Download Game
+          </a>
+        ) : (
+          <button
+            disabled
+            className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
+          >
+            Game Coming Soon
+          </button>
+        )}
+        <button
+          onClick={handleSignOut}
+          className="mt-4 bg-red-600 hover:bg-red-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
         >
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-blue-500">PLANETARY DEEP SEA SURVIVAL</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8">
-            Dive into the depths and explore the mysteries of the ocean.
-          </p>
+          Sign Out
+        </button>
+      </>
+    ) : (
+      <button
+        onClick={() => router.push('/sign-in')}
+        className="bg-blue-600 hover:bg-blue-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
+      >
+        Sign In to Download
+      </button>
+    )}
+  </motion.div>
+</section>
 
-          {loading ? (
-            <button
-              disabled
-              className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-            >
-              Loading authentication...
-            </button>
-          ) : user ? (
-            <>
-              {isLoading ? (
-                <button
-                  disabled
-                  className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-                >
-                  Loading game...
-                </button>
-              ) : currentFile ? (
-                <a
-                  href={`/uploads/${currentFile}`}
-                  download
-                  className="bg-blue-600 hover:bg-blue-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-                >
-                  Download Game
-                </a>
-              ) : (
-                <button
-                  disabled
-                  className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-                >
-                  Game Coming Soon
-                </button>
-              )}
-              <button
-                onClick={handleSignOut}
-                className="mt-4 bg-red-600 hover:bg-red-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => router.push('/sign-in')}
-              className="bg-blue-600 hover:bg-blue-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-            >
-              Sign In to Download
-            </button>
-          )}
-        </motion.div>
-      </section>
-
-      {/* Problem Section */}
+      {/* Game Features Section */}
       <section className="bg-gray-900 text-white py-20 px-6">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h3 className="text-3xl font-semibold mb-4 text-blue-400"> The Problem</h3>
+            <h3 className="text-3xl font-semibold mb-4 text-blue-400"> Game Features</h3>
             <p className="text-gray-300 mb-4">
-              Most games focus purely on entertainment. Players aren&apos;t pushed to analyze, strategize, or solve meaningful problems.
+              Planetary Deep-Sea Survival is a thrilling underwater adventure game that combines exploration, survival, and strategy.
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Lack of puzzles or problem-solving tasks</li>
-              <li>No logical or strategic thinking required</li>
-              <li>Minimal educational value behind the fun</li>
+              <li>Explore vast underwater landscapes filled with hidden treasures and dangers.</li>
+              <li>Craft tools and equipment to survive the harsh ocean environment.</li>
+              <li>Encounter unique marine life, from friendly creatures to hostile predators.</li>
+              <li>Uncover the mysteries of a lost civilization beneath the waves.</li>
             </ul>
           </div>
           <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
@@ -135,37 +139,40 @@ export default function GameShowcase() {
         </div>
       </section>
 
-      {/* Solution Section */}
+      {/* Screenshot Section */}
       <section className="bg-black text-white py-20 px-6">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
-            [Pixel art / game UI image preview]
+            [Insert game screenshot or gameplay preview]
           </div>
           <div>
-            <h3 className="text-3xl font-semibold mb-4 text-green-400"> The Solution</h3>
+            <h3 className="text-3xl font-semibold mb-4 text-green-400"> Game Screenshots</h3>
             <p className="text-gray-300 mb-4">
-              <strong>&quot;Unlocking Minds&quot;</strong> is an educational mystery game for ages 16–30. It merges logic-based gameplay with fun, story-driven challenges.
+              Immerse yourself in the stunning visuals of Planetary Deep-Sea Survival. Every detail is crafted to bring the underwater world to life.
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Solve puzzles, uncover clues, and crack mysteries</li>
-              <li>Dynamic difficulty adapts to your skill level</li>
-              <li>Choices matter every decision impacts your story</li>
-              <li>Visually rich pixel art using Aseprite</li>
+              <li>Dynamic lighting and realistic water effects.</li>
+              <li>Beautifully designed marine environments.</li>
+              <li>Detailed character and creature animations.</li>
+              <li>Interactive objects and puzzles to solve.</li>
             </ul>
           </div>
         </div>
       </section>
 
-      {/* Why It Matters Section */}
+      {/* Trailer Section */}
       <section className="bg-gradient-to-tr from-blue-900 to-black text-white py-20 px-6">
         <div className="max-w-5xl mx-auto text-center">
-          <h3 className="text-3xl md:text-4xl font-bold mb-6"> Why It Matters</h3>
-          <p className="text-lg md:text-xl text-gray-300">
-            &quot;Unlocking Minds&quot; is more than just a game it&apos;s a way to sharpen your brain while having fun. We believe education should be exciting, and entertainment should make you think.
-            Our mission is to inspire a new wave of games that help players grow smarter while staying fully engaged.
+          <h3 className="text-3xl md:text-4xl font-bold mb-6"> Watch the Trailer</h3>
+          <p className="text-lg md:text-xl text-gray-300 mb-8">
+            Get a glimpse of the adventure that awaits you in Planetary Deep-Sea Survival. Watch the trailer and dive into the action!
           </p>
+          <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
+            [Insert trailer video embed or placeholder]
+          </div>
         </div>
       </section>
+
       <Footer />
     </main>
   );

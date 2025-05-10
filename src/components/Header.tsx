@@ -67,20 +67,20 @@ export default function Header() {
               {isSignedIn ? (
                 <>
                   {/* User Dropdown */}
-                  <button
+                    <button
                     type="button"
                     className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                     id="user-menu-button"
                     aria-expanded={dropdownOpen}
                     onClick={toggleDropdown}
-                  >
+                    >
                     <span className="sr-only">Open user menu</span>
                     <img
                       className="w-8 h-8 rounded-full"
-                      src="/docs/images/people/profile-picture-3.jpg"
+                      src="/public/images/abstract-user-flat-4.svg"
                       alt="user photo"
                     />
-                  </button>
+                    </button>
                   <div
                     className={`z-50 ${dropdownOpen ? 'block' : 'hidden'} my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
                     id="user-dropdown"
