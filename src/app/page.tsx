@@ -52,9 +52,7 @@ export default function GameShowcase() {
       <Header />
 
       {/* Hero Section */}
-      <section
-  className="min-h-screen text-white px-6 py-20 flex flex-col items-center text-center heroSection"
->
+      <section className="hero-section min-h-screen text-white px-6 py-20 flex flex-col items-center text-center">
   <motion.div
     initial={{ opacity: 0, y: -30 }}
     animate={{ opacity: 1, y: 0 }}
