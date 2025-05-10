@@ -67,60 +67,62 @@ export default function Header() {
               {isSignedIn ? (
                 <>
                   {/* User Dropdown */}
-                  <button
-                    type="button"
-                    className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 z-50" // Ensure button is above dropdown
-                    id="user-menu-button"
-                    aria-expanded={dropdownOpen}
-                    onClick={toggleDropdown}
-                  >
-                    <span className="sr-only">Open user menu</span>
-                    <svg
-                      className="w-8 h-8 rounded-full"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 z-50"
+                      id="user-menu-button"
+                      aria-expanded={dropdownOpen}
+                      onClick={toggleDropdown}
                     >
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                  </button>
-                  <div
-                    className={`absolute right-0 mt-2 w-48 z-40 ${
-                      dropdownOpen ? 'block' : 'hidden'
-                    } text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
-                    id="user-dropdown"
-                  >
-                    <div className="px-4 py-3">
-                      <span className="block text-sm text-gray-900 dark:text-white">
-                        {userEmail}
-                      </span>
+                      <span className="sr-only">Open user menu</span>
+                      <svg
+                        className="w-8 h-8 rounded-full"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </button>
+                    <div
+                      className={`absolute right-0 mt-2 w-48 z-40 ${
+                        dropdownOpen ? 'block' : 'hidden'
+                      } text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
+                      id="user-dropdown"
+                    >
+                      <div className="px-4 py-3">
+                        <span className="block text-sm text-gray-900 dark:text-white">
+                          {userEmail}
+                        </span>
+                      </div>
+                      <ul className="py-2" aria-labelledby="user-menu-button">
+                        <li>
+                          <Link
+                            href="/dashboard"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                          >
+                            Dashboard
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/settings"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                          >
+                            Settings
+                          </Link>
+                        </li>
+                        <li>
+                          <button
+                            onClick={handleSignOut}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                          >
+                            Sign out
+                          </button>
+                        </li>
+                      </ul>
                     </div>
-                    <ul className="py-2" aria-labelledby="user-menu-button">
-                      <li>
-                        <Link
-                          href="/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                        >
-                          Dashboard
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/settings"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                        >
-                          Settings
-                        </Link>
-                      </li>
-                      <li>
-                        <button
-                          onClick={handleSignOut}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                        >
-                          Sign out
-                        </button>
-                      </li>
-                    </ul>
                   </div>
                 </>
               ) : (
