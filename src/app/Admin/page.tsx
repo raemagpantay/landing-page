@@ -106,10 +106,15 @@ export default function AdminDashboard() {
               "⚠️ Uploading a new file will replace the current file." : 
               "No file currently exists. Ready to upload."}
           </p>
+          <label htmlFor="zipFile" className="block text-sm font-medium text-gray-400 mb-2">
+            Select a ZIP file to upload:
+          </label>
           <input
+            id="zipFile"
             type="file"
             accept=".zip"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
+            placeholder="Choose a ZIP file"
             className="block w-full mb-4 p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
           />
           <button

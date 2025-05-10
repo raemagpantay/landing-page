@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Image from 'next/image';
 
 export default function GameShowcase() {
   const [currentFile, setCurrentFile] = useState<string | null>(null);
@@ -52,8 +53,7 @@ export default function GameShowcase() {
 
       {/* Hero Section */}
       <section
-  className="min-h-screen bg-cover bg-center text-white px-6 py-20 flex flex-col items-center text-center"
-  style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+  className="min-h-screen text-white px-6 py-20 flex flex-col items-center text-center heroSection"
 >
   <motion.div
     initial={{ opacity: 0, y: -30 }}
@@ -62,7 +62,7 @@ export default function GameShowcase() {
     className="max-w-3xl bg-opacity-50 p-8 rounded-lg"
   >
     <h1 className="text-5xl md:text-6xl font-bold mb-6">
-      <span className="text-blue-500">PLANETARY DEEP SEA SURVIVAL</span>
+      <span className="text-blue-600">PLANETARY DEEP SEA SURVIVAL</span>
     </h1>
     <p className="text-xl md:text-2xl text-gray-300 mb-8">
       Dive into the depths and explore the mysteries of the ocean.
@@ -135,10 +135,12 @@ export default function GameShowcase() {
           </div>
           <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
             
-            <img
+            <Image
               src="/images/screenshot1.jpg" // Replace with the actual path to your gameplay preview image
               alt="Gameplay Preview"
               className="w-full h-full object-cover"
+              width={1920} // Add appropriate width
+              height={1080} // Add appropriate height
             />
           </div>
         </div>
@@ -148,10 +150,12 @@ export default function GameShowcase() {
       <section className="bg-black text-white py-20 px-6">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
-            <img
-              src="/images/screenshot2.jpg" // Replace with the actual path to your gameplay screenshot
+            <Image
+              src="/images/screenshot4.jpg" // Replace with the actual path to your gameplay screenshot
               alt="Gameplay Screenshot"
               className="w-full h-full object-cover"
+              width={1920} // Add appropriate width
+              height={1080} // Add appropriate height
             />
           </div>
           <div>
