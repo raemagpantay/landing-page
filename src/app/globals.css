@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+.hero-section {
+  background-image: url('https://via.placeholder.com/1920x1080');
+  background-size: cover;
+  background-position: center;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -19,11 +25,6 @@
   }
 }
 
-.hero-section {
-  background-image: url('https://via.placeholder.com/1920x1080');
-  background-size: cover;
-  background-position: center;
-}
 body {
   background: var(--background);
   color: var(--foreground);
