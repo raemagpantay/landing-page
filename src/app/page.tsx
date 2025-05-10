@@ -48,7 +48,7 @@ export default function GameShowcase() {
   };
 
   return (
-    <main className="bg-black text-white">
+    <main className=" text-white">
       <Header />
 
       {/* Hero Section */}
