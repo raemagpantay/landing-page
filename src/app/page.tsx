@@ -54,7 +54,6 @@ export default function GameShowcase() {
       {/* Hero Section */}
       <section
   className="min-h-screen bg-cover bg-center text-white px-6 py-20 flex flex-col items-center text-center"
-  style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
 >
     
   <motion.div
