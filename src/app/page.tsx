@@ -12,7 +12,7 @@ import Footer from '../components/Footer';
 export default function GameShowcase() {
   const [currentFile, setCurrentFile] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, loading, error] = useAuthState(auth); // Track the authenticated user and loading state
+  const [user, loading] = useAuthState(auth); // Track the authenticated user and loading state
   const router = useRouter();
 
   // Fetch the current ZIP file name on component mount
@@ -59,7 +59,7 @@ export default function GameShowcase() {
     initial={{ opacity: 0, y: -30 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8 }}
-    className="max-w-3xl bg-black bg-opacity-50 p-8 rounded-lg"
+    className="max-w-3xl bg-opacity-50 p-8 rounded-lg"
   >
     <h1 className="text-5xl md:text-6xl font-bold mb-6">
       <span className="text-blue-500">PLANETARY DEEP SEA SURVIVAL</span>

@@ -75,11 +75,14 @@ export default function Header() {
                     onClick={toggleDropdown}
                     >
                     <span className="sr-only">Open user menu</span>
-                    <img
+                    <svg
                       className="w-8 h-8 rounded-full"
-                      src="/public/images/abstract-user-flat-4.svg"
-                      alt="user photo"
-                    />
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
                     </button>
                   <div
                     className={`z-50 ${dropdownOpen ? 'block' : 'hidden'} my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
