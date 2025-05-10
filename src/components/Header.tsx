@@ -45,7 +45,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-transparent text-white py-6 px-6 shadow-md">
+    <header className="bg-transparent text-white py-6 px-6 fixed top-0 left-0 w-full z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
@@ -63,7 +63,7 @@ export default function Header() {
         {/* Navigation Menu */}
         <nav className="bg-transparent">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+            <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse relative">
               {isSignedIn ? (
                 <>
                   {/* User Dropdown */}
@@ -85,7 +85,9 @@ export default function Header() {
                     </svg>
                   </button>
                   <div
-                    className={`z-50 ${dropdownOpen ? 'block' : 'hidden'} my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
+                    className={`absolute right-0 mt-2 w-48 z-50 ${
+                      dropdownOpen ? 'block' : 'hidden'
+                    } text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
                     id="user-dropdown"
                   >
                     <div className="px-4 py-3">
