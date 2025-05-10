@@ -69,7 +69,7 @@ export default function Header() {
                   {/* User Dropdown */}
                   <button
                     type="button"
-                    className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                    className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600 z-50" // Ensure button is above dropdown
                     id="user-menu-button"
                     aria-expanded={dropdownOpen}
                     onClick={toggleDropdown}
@@ -85,7 +85,7 @@ export default function Header() {
                     </svg>
                   </button>
                   <div
-                    className={`absolute right-0 mt-2 w-48 z-50 ${
+                    className={`absolute right-0 mt-2 w-48 z-40 ${
                       dropdownOpen ? 'block' : 'hidden'
                     } text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
                     id="user-dropdown"

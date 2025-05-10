@@ -134,7 +134,12 @@ export default function GameShowcase() {
             </ul>
           </div>
           <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
-            [Insert related image or video preview]
+            
+            <img
+              src="/images/screenshot1.jpg" // Replace with the actual path to your gameplay preview image
+              alt="Gameplay Preview"
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
       </section>
@@ -143,7 +148,11 @@ export default function GameShowcase() {
       <section className="bg-black text-white py-20 px-6">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
-            [Insert game screenshot or gameplay preview]
+            <img
+              src="/images/screenshot2.jpg" // Replace with the actual path to your gameplay screenshot
+              alt="Gameplay Screenshot"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
             <h3 className="text-3xl font-semibold mb-4 text-green-400"> Game Screenshots</h3>
@@ -168,7 +177,16 @@ export default function GameShowcase() {
             Get a glimpse of the adventure that awaits you in Planetary Deep-Sea Survival. Watch the trailer and dive into the action!
           </p>
           <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500">
-            [Insert trailer video embed or placeholder]
+            <iframe
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/your-trailer-video-id" // Replace with your actual YouTube trailer link
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
           </div>
         </div>
       </section>
