@@ -93,87 +93,133 @@ export default function GameShowcase() {
           }}
           aria-hidden
         />
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
-          className="max-w-3xl bg-opacity-50 p-8 rounded-lg relative z-10 shadow-2xl"
+<motion.div
+  className="mb-32 w-full flex flex-col items-center"
+  initial={{ opacity: 0, y: 40 }}
+  animate={{ opacity: 1, y: 120 }}
+  transition={{ duration: 1.5, ease: 'easeOut' }}
+>
+  {/* Multi-line animated game title */}
+  <div className="select-none">
+    {[
+      { text: "PLANETARY", color: "text-red-500" },
+      { text: "DEEP SEA", color: "text-blue-400" },
+      { text: "SURVIVAL", color: "text-yellow-400" },
+    ].map((line, idx) => (
+      <div
+      key={line.text}
+      className={`title flex justify-center text-6xl md:text-8xl font-extrabold uppercase tracking-wider ${line.color}`}
+      style={{
+        transform: "translateX(-50%) rotate(-8deg)",
+        left: "50%",
+        position: "relative",
+        lineHeight: 1.1,
+      }}
+      >
+      {line.text.split("").map((char, i) => (
+        <motion.span
+        key={i}
+        className="inline-block"
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3 + idx * 0.28 + i * 0.06,
+          duration: 0.7,
+          type: "spring",
+          stiffness: 400,
+          damping: 18,
+        }}
+        style={{
+          transform: "skew(-10deg)",
+          textShadow:
+          "#533d4a 1px 1px, #533d4a 2px 2px, #533d4a 3px 3px, #533d4a 4px 4px, #533d4a 5px 5px, #533d4a 6px 6px",
+          minWidth: "10px",
+          minHeight: "10px",
+          position: "relative",
+        }}
         >
-          <motion.h1
-            className="text-5xl md:text-6xl font-bold mb-6"
-            initial={{ textShadow: '0 0 0px #00f6ff' }}
-            animate={{ textShadow: [
-              '0 0 0px #00f6ff',
-              '0 0 16px #00f6ff, 0 0 32px #00f6ff',
-              '0 0 0px #00f6ff'
-            ] }}
-            transition={{ duration: 2.5, repeat: Infinity, repeatType: 'reverse' }}
-          >
-            <span className="text-blue-600 drop-shadow-glow">PLANETARY DEEP SEA SURVIVAL</span>
-          </motion.h1>
-          <motion.p
-            className="text-xl md:text-2xl text-gray-300 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 1.2 }}
-          >
-            Dive into the depths and explore the mysteries of the ocean.
-          </motion.p>
-
-          {loading ? (
-            <motion.button
-              disabled
-              className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-              whileHover={{ scale: 1.05 }}
-            >
-              Loading authentication...
-            </motion.button>
-          ) : user ? (
-            <>
-              {isLoading ? (
-                <motion.button
-                  disabled
-                  className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  Loading game...
-                </motion.button>
-              ) : currentFile ? (
-                <motion.a
-                  href={`/uploads/${currentFile}`}
-                  download
-                  className="bg-blue-600 hover:bg-blue-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-                  whileHover={{ scale: 1.08, boxShadow: '0 0 24px #00f6ff' }}
-                >
-                  Download Game
-                </motion.a>
-              ) : (
-                <motion.button
-                  disabled
-                  className="bg-gray-600 cursor-not-allowed px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  Game Coming Soon
-                </motion.button>
-              )}
-              <motion.button
-                onClick={handleSignOut}
-                className="mt-4 bg-red-600 hover:bg-red-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-                whileHover={{ scale: 1.08, boxShadow: '0 0 24px #ff0055' }}
-              >
-                Sign Out
-              </motion.button>
-            </>
-          ) : (
-            <motion.button
-              onClick={() => router.push('/sign-in')}
-              className="bg-blue-600 hover:bg-blue-500 transition px-6 py-3 rounded-2xl text-lg font-medium shadow-xl"
-              whileHover={{ scale: 1.08, boxShadow: '0 0 24px #00f6ff' }}
-            >
-              Sign In to Download
-            </motion.button>
-          )}
-        </motion.div>
+        {char === " " ? "\u00A0" : char}
+        </motion.span>
+      ))}
+      </div>
+    ))}
+  </div>
+    
+  {/* Download/Sign In Button */}
+  <motion.div
+    className="flex flex-col items-center w-full mt-10" // Added mt-10 to lower the button
+    initial={{ opacity: 0, y: 40 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 2.1, duration: 0.7, ease: 'easeOut' }}
+  >
+    {!user ? (
+  <button
+    onClick={() => router.push('/sign-in')}
+    className="restart-btn relative -rotate-6 w-64 h-16 flex items-center justify-center text-2xl font-bold uppercase tracking-widest border-4 border-cyan-400 rounded-full bg-transparent select-none transition-all duration-200 hover:bg-cyan-400/10 hover:scale-105 active:scale-95"
+    style={{
+      color: '#22d3ee',
+      boxShadow: '#533d4a 1px 1px, #533d4a 2px 2px, #533d4a 3px 3px, #533d4a 4px 4px, #533d4a 5px 5px, #533d4a 6px 6px',
+      visibility: 'visible',
+      opacity: 1,
+      letterSpacing: '2px',
+    }}
+  >
+    {"Sign In to Download".split("").map((char, i) => (
+      <span
+        key={i}
+        className="inline-block"
+        style={{
+          transform: 'skew(-10deg)',
+          minWidth: '10px',
+          minHeight: '10px',
+          position: 'relative',
+          textShadow:
+            '#533d4a 1px 1px, #533d4a 2px 2px, #533d4a 3px 3px, #533d4a 4px 4px, #533d4a 5px 5px, #533d4a 6px 6px',
+        }}
+      >
+        {char === " " ? "\u00A0" : char}
+      </span>
+    ))}
+  </button>
+) : (
+  <a
+    href={currentFile ? `/uploads/${currentFile}` : "#"}
+    download
+    className={`restart-btn relative -rotate-6 w-64 h-16 flex items-center justify-center text-2xl font-bold uppercase tracking-widest border-4 border-cyan-400 rounded-full bg-transparent select-none transition-all duration-200 hover:bg-cyan-400/10 hover:scale-105 active:scale-95 ${
+      currentFile
+        ? "cursor-pointer"
+        : "opacity-60 cursor-not-allowed"
+    }`}
+    style={{
+      color: '#22d3ee',
+      boxShadow: '#533d4a 1px 1px, #533d4a 2px 2px, #533d4a 3px 3px, #533d4a 4px 4px, #533d4a 5px 5px, #533d4a 6px 6px',
+      visibility: 'visible',
+      opacity: 1,
+      letterSpacing: '2px',
+    }}
+    tabIndex={currentFile ? 0 : -1}
+    aria-disabled={!currentFile}
+  >
+    {"Download Now".split("").map((char, i) => (
+      <span
+        key={i}
+        className="inline-block"
+        style={{
+          transform: 'skew(-10deg)',
+          minWidth: '10px',
+          minHeight: '10px',
+          position: 'relative',
+          textShadow:
+            '#533d4a 1px 1px, #533d4a 2px 2px, #533d4a 3px 3px, #533d4a 4px 4px, #533d4a 5px 5px, #533d4a 6px 6px',
+        }}
+      >
+        {char === " " ? "\u00A0" : char}
+      </span>
+    ))}
+  </a>
+)}
+  </motion.div>
+</motion.div>
       </section>
 
       {/* Game Features Section with animated entrance */}
