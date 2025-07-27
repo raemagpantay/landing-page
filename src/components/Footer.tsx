@@ -2,35 +2,47 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function Footer() {
+  const router = useRouter();
+
+  const handleTeamClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    router.push('/Team');
+  };
+
   return (
     <footer className="bg-black text-white py-4 mt-0">
       <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
         {/* Logo centered in the footer */}
         <div className="mb-2">
-            <Link href="/">
+          <Link href="/">
             <Image
-              src="/favicon.ico" // Path to your favicon in the public folder
+              src="/favicon.ico"
               alt="Cerebral Enigma Logo"
-              width={64} // Adjust the width of the logo (16 * 4 = 64px)
-              height={64} // Adjust the height of the logo (16 * 4 = 64px)
-              className="h-16" // Optional: Add custom styles
+              width={64}
+              height={64}
+              className="h-16"
             />
-            </Link>
+          </Link>
         </div>
 
         {/* Social and Links */}
         <div className="flex space-x-4 mb-2">
-          <Link href="https://twitter.com" target="_blank" className="hover:text-blue-500 transition duration-300 text-sm">
+          <Link href="https://twitter.com/" target="_blank" className="hover:text-blue-500 transition duration-300 text-sm">
             Twitter
           </Link>
-          <Link href="https://github.com" target="_blank" className="hover:text-blue-500 transition duration-300 text-sm">
+          <Link href="https://github.com/" target="_blank" className="hover:text-blue-500 transition duration-300 text-sm">
             GitHub
           </Link>
-          <Link href="/contact" className="hover:text-blue-500 transition duration-300 text-sm">
-            Contact
-          </Link>
+          <a
+            href="/Team"
+            onClick={handleTeamClick}
+            className="hover:text-blue-500 transition duration-300 text-sm"
+          >
+            Team
+          </a>
         </div>
 
         {/* Copyright */}
