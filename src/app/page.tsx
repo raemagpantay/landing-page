@@ -31,10 +31,9 @@ function useParallax(offset = 30) {
 
 export default function GameShowcase() {
   const [currentFile, setCurrentFile] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, loading] = useAuthState(auth); // Track the authenticated user and loading state
+  const [, setIsLoading] = useState(true);
+  const [user] = useAuthState(auth); // Track the authenticated user and loading state
   const router = useRouter();
-
   // Fetch the current ZIP file name on component mount
   useEffect(() => {
     const fetchCurrentFile = async () => {
@@ -56,15 +55,6 @@ export default function GameShowcase() {
   }, []);
 
   // Handle user sign-out
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      sessionStorage.removeItem('userEmail'); // Clear session storage
-      router.push('/sign-in'); // Redirect to the sign-in page
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
 
   // Parallax for hero
   const parallax = useParallax(18);
@@ -154,7 +144,7 @@ export default function GameShowcase() {
   >
     {!user ? (
   <button
-    onClick={() => router.push('/sign-in')}
+    onClick={() => (useRouter()).push('/sign-in')}
     className="restart-btn relative -rotate-6 w-64 h-16 flex items-center justify-center text-2xl font-bold uppercase tracking-widest border-4 border-cyan-400 rounded-full bg-transparent select-none transition-all duration-200 hover:bg-cyan-400/10 hover:scale-105 active:scale-95"
     style={{
       color: '#22d3ee',
