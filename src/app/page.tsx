@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Image from 'next/image';
@@ -30,10 +29,11 @@ function useParallax(offset = 30) {
 }
 
 export default function GameShowcase() {
+  const [user] = useAuthState(auth);
   const [currentFile, setCurrentFile] = useState<string | null>(null);
   const [, setIsLoading] = useState(true);
-  const [user] = useAuthState(auth); // Track the authenticated user and loading state
-  const router = useRouter();
+  const router = useRouter(); // <-- keep this at the top level
+
   // Fetch the current ZIP file name on component mount
   useEffect(() => {
     const fetchCurrentFile = async () => {
@@ -53,8 +53,6 @@ export default function GameShowcase() {
 
     fetchCurrentFile();
   }, []);
-
-  // Handle user sign-out
 
   // Parallax for hero
   const parallax = useParallax(18);
@@ -144,7 +142,7 @@ export default function GameShowcase() {
   >
     {!user ? (
   <button
-    onClick={() => (useRouter()).push('/sign-in')}
+    onClick={() => router.push('/sign-in')}
     className="restart-btn relative -rotate-6 w-64 h-16 flex items-center justify-center text-2xl font-bold uppercase tracking-widest border-4 border-cyan-400 rounded-full bg-transparent select-none transition-all duration-200 hover:bg-cyan-400/10 hover:scale-105 active:scale-95"
     style={{
       color: '#22d3ee',
