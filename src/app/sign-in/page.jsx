@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const ADMIN_EMAILS = ['raealjon2003@gmail.com']; // Add your admin emails here
-
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,15 +25,11 @@ const SignIn = () => {
         setError('Invalid email or password.');
         return;
       }
+      console.log({ res });
       sessionStorage.setItem('user', true);
       setEmail('');
       setPassword('');
-      // Check if the user is an admin
-      if (ADMIN_EMAILS.includes(email)) {
-        router.push('/Admin');
-      } else {
-        router.push('/');
-      }
+      router.push('/');
     } catch (e) {
       if (e.code === 'auth/user-not-found') {
         setError('User does not exist.');

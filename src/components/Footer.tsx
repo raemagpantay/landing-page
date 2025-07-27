@@ -28,8 +28,8 @@ export default function Footer() {
           <Link href="https://github.com" target="_blank" className="hover:text-blue-500 transition duration-300 text-sm">
             GitHub
           </Link>
-          <Link href="/Team" className="hover:text-blue-500 transition duration-300 text-sm">
-            Team
+          <Link href="/contact" className="hover:text-blue-500 transition duration-300 text-sm">
+            Contact
           </Link>
         </div>
 
