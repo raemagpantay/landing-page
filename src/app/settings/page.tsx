@@ -109,14 +109,15 @@ export default function SettingsPage() {
         typeof error === 'object' &&
         error !== null &&
         'code' in error &&
-        typeof (error as any).code === 'string'
+        typeof (error as { code?: unknown }).code === 'string'
       ) {
-        if ((error as any).code === 'auth/wrong-password') {
+        const errObj = error as { code?: string; message?: string };
+        if (errObj.code === 'auth/wrong-password') {
           setStatus('❌ Current password is incorrect.');
-        } else if ((error as any).code === 'auth/weak-password') {
+        } else if (errObj.code === 'auth/weak-password') {
           setStatus('❌ Password should be at least 6 characters.');
-        } else if ('message' in error && typeof (error as any).message === 'string') {
-          setStatus(`❌ ${(error as any).message}`);
+        } else if (typeof errObj.message === 'string') {
+          setStatus(`❌ ${errObj.message}`);
         } else {
           setStatus('❌ An unknown error occurred.');
         }
