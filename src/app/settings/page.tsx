@@ -43,8 +43,12 @@ export default function SettingsPage() {
         }
         setStatus('✅ Profile updated successfully!');
       }
-    } catch (error: any) {
-      setStatus(`❌ ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setStatus(`❌ ${error.message}`);
+      } else {
+        setStatus('❌ An unknown error occurred.');
+      }
     }
   };
 
@@ -70,7 +74,7 @@ export default function SettingsPage() {
       await updateProfile(user, { photoURL: url });
       setPhotoURL(url);
       setStatus('✅ Profile picture updated!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       setStatus('❌ Failed to update profile picture.');
     } finally {
       setUploading(false);
@@ -100,13 +104,26 @@ export default function SettingsPage() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-    } catch (error: any) {
-      if (error.code === 'auth/wrong-password') {
-        setStatus('❌ Current password is incorrect.');
-      } else if (error.code === 'auth/weak-password') {
-        setStatus('❌ Password should be at least 6 characters.');
-      } else {
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        typeof (error as any).code === 'string'
+      ) {
+        if ((error as any).code === 'auth/wrong-password') {
+          setStatus('❌ Current password is incorrect.');
+        } else if ((error as any).code === 'auth/weak-password') {
+          setStatus('❌ Password should be at least 6 characters.');
+        } else if ('message' in error && typeof (error as any).message === 'string') {
+          setStatus(`❌ ${(error as any).message}`);
+        } else {
+          setStatus('❌ An unknown error occurred.');
+        }
+      } else if (error instanceof Error) {
         setStatus(`❌ ${error.message}`);
+      } else {
+        setStatus('❌ An unknown error occurred.');
       }
     }
   };
