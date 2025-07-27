@@ -50,7 +50,7 @@ export default function Team() {
           </p>
           {/* Team Cards */}
           <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-6 justify-center items-stretch">
-            {team.map((member, idx) => (
+            {team.map((member) => (
               <div
                 key={member.name}
                 className={`relative flex-1 min-w-[320px] max-w-md rounded-2xl overflow-hidden shadow-2xl group transition-all duration-500`}
