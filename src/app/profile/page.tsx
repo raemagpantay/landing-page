@@ -5,6 +5,7 @@ import { auth } from '@/app/firebase/config';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function ProfilePage() {
   const [userInfo, setUserInfo] = useState<{
@@ -28,6 +29,15 @@ export default function ProfilePage() {
     }
   }, []);
 
+  // Conditional background style for the avatar circle
+  const avatarBgStyle = !userInfo.photoURL
+    ? {
+        backgroundImage: "url('/images/abstract-user-flat-4.svg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {};
+
   return (
     <>
       <Header />
@@ -35,16 +45,21 @@ export default function ProfilePage() {
         <div className="w-full max-w-md bg-gray-800 rounded-xl shadow-xl p-8">
           <h1 className="text-3xl font-bold mb-6 text-center">Profile</h1>
           <div className="flex flex-col items-center mb-8">
-            <img
-              src={
-                userInfo.photoURL ||
-                'https://ui-avatars.com/api/?name=' +
-                  encodeURIComponent(userInfo.displayName || 'User') +
-                  '&background=374151&color=fff&size=128'
-              }
-              alt="Profile"
-              className="w-28 h-28 rounded-full object-cover border-4 border-blue-600 shadow-lg"
-            />
+            <div
+              className="w-28 h-28 rounded-full border-4 border-blue-600 shadow-lg flex items-center justify-center"
+              style={avatarBgStyle}
+            >
+              {userInfo.photoURL ? (
+                <Image
+                  src={userInfo.photoURL}
+                  alt="Profile"
+                  width={112}
+                  height={112}
+                  className="w-28 h-28 rounded-full object-cover"
+                  priority
+                />
+              ) : null}
+            </div>
           </div>
           <div className="space-y-6">
             <div>

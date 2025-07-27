@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { updateProfile, updateEmail, signOut } from 'firebase/auth';
+import { updateProfile, updateEmail, signOut, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { auth } from '@/app/firebase/config';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -17,6 +17,9 @@ export default function SettingsPage() {
   const [photoURL, setPhotoURL] = useState('');
   const [status, setStatus] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -74,6 +77,49 @@ export default function SettingsPage() {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('');
+    if (!user) {
+      setStatus('❌ User not found.');
+      return;
+    }
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setStatus('❌ Please fill in all password fields.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setStatus('❌ New passwords do not match.');
+      return;
+    }
+    try {
+      const credential = EmailAuthProvider.credential(user.email!, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      setStatus('✅ Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      if (error.code === 'auth/wrong-password') {
+        setStatus('❌ Current password is incorrect.');
+      } else if (error.code === 'auth/weak-password') {
+        setStatus('❌ Password should be at least 6 characters.');
+      } else {
+        setStatus(`❌ ${error.message}`);
+      }
+    }
+  };
+
+  // Conditional background style for the avatar circle
+  const avatarBgStyle = !photoURL
+    ? {
+        backgroundImage: "url('/images/abstract-user-flat-4.svg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {};
+
   return (
     <>
       <Header />
@@ -82,25 +128,23 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold mb-6 text-center">Account Settings</h1>
           <div className="flex flex-col items-center mb-8">
             <div
-              className="relative group cursor-pointer"
+              className="relative group cursor-pointer w-28 h-28 rounded-full border-4 border-blue-600 shadow-lg flex items-center justify-center"
+              style={avatarBgStyle}
               onClick={handleAvatarClick}
               title="Change profile picture"
             >
-              <Image
-                src={
-                  photoURL ||
-                  'https://ui-avatars.com/api/?name=' +
-                    encodeURIComponent(displayName || 'User') +
-                    '&background=374151&color=fff&size=128'
-                }
-                alt="Profile"
-                width={112}
-                height={112}
-                className="w-28 h-28 rounded-full object-cover border-4 border-blue-600 shadow-lg"
-                priority
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                <span className="text-sm">Change</span>
+              {photoURL ? (
+                <Image
+                  src={photoURL}
+                  alt="Profile"
+                  width={112}
+                  height={112}
+                  className="w-28 h-28 rounded-full object-cover"
+                  priority
+                />
+              ) : null}
+              <div className="absolute inset-0 bg-black bg-opacity-40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                <span className="text-sm">Change Profile</span>
               </div>
               <input
                 ref={fileInputRef}
@@ -143,6 +187,48 @@ export default function SettingsPage() {
               Save Changes
             </button>
           </form>
+
+          {/* Change Password Section */}
+          <form onSubmit={handleChangePassword} className="space-y-6 mt-10">
+            <h2 className="text-xl font-semibold mb-2 text-center">Change Password</h2>
+            <div>
+              <label className="block mb-2 text-gray-300">Current Password</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                placeholder="Enter current password"
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-gray-300">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                placeholder="Enter new password"
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-gray-300">Confirm New Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                placeholder="Confirm new password"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-500 transition p-3 rounded-lg font-medium"
+            >
+              Change Password
+            </button>
+          </form>
+
           {status && (
             <div className="mt-4 text-center text-lg">{status}</div>
           )}
