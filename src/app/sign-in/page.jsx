@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -41,7 +43,20 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center relative">
+      {/* Home Icon Button */}
+      <div className="absolute top-6 left-6">
+        <Link href="/">
+          <Image
+            src="/favicon.ico"
+            alt="Home"
+            width={48}
+            height={48}
+            className="rounded-full hover:scale-110 transition"
+            title="Go to Homepage"
+          />
+        </Link>
+      </div>
       <div className="bg-gray-800 p-10 rounded-lg shadow-xl w-96">
         <h1 className="text-white text-2xl mb-5">Sign In</h1>
         <input

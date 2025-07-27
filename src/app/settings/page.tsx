@@ -7,6 +7,7 @@ import { auth } from '@/app/firebase/config';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Image from 'next/image';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -85,7 +86,7 @@ export default function SettingsPage() {
               onClick={handleAvatarClick}
               title="Change profile picture"
             >
-              <img
+              <Image
                 src={
                   photoURL ||
                   'https://ui-avatars.com/api/?name=' +
@@ -93,7 +94,10 @@ export default function SettingsPage() {
                     '&background=374151&color=fff&size=128'
                 }
                 alt="Profile"
+                width={112}
+                height={112}
                 className="w-28 h-28 rounded-full object-cover border-4 border-blue-600 shadow-lg"
+                priority
               />
               <div className="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                 <span className="text-sm">Change</span>
