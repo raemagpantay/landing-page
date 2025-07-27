@@ -53,13 +53,13 @@ export default function GameShowcase() {
 
       {/* Hero Section */}
       <section
-  className="min-h-screen bg-cover bg-center text-white px-6 py-20 flex flex-col items-center text-center"
->
-    
+        className="min-h-screen bg-cover bg-center text-white px-6 py-20 flex flex-col items-center text-center"
+        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      >
   <motion.div
     initial={{ opacity: 0, y: -30 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.8 }}
+           style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
     className="max-w-3xl bg-opacity-50 p-8 rounded-lg"
   >
     <h1 className="text-5xl md:text-6xl font-bold mb-6">
