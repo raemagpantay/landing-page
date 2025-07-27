@@ -74,7 +74,7 @@ export default function SettingsPage() {
       await updateProfile(user, { photoURL: url });
       setPhotoURL(url);
       setStatus('✅ Profile picture updated!');
-    } catch (error: unknown) {
+    } catch {
       setStatus('❌ Failed to update profile picture.');
     } finally {
       setUploading(false);
