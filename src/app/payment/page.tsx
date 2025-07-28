@@ -9,9 +9,12 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 
 if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY === undefined) {
-  throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");
+  console.warn("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");
 }
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 function PaymentContent() {
   const [amount, setAmount] = useState<number>(0);
@@ -29,6 +32,21 @@ function PaymentContent() {
       setProductName(nameParam);
     }
   }, [searchParams]);
+
+  // Check if Stripe is available
+  if (!stripePromise) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Payment System Unavailable</h1>
+          <p className="mb-4">Payment processing is currently unavailable. Please try again later.</p>
+          <Link href="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            Return to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!amount) {
     return (
