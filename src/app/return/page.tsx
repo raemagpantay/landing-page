@@ -1,15 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function ReturnPage() {
+interface OrderDetails {
+  amount: number;
+  currency: string;
+  payment_status: string;
+}
+
+function ReturnContent() {
   const [status, setStatus] = useState('loading')
   const [customerEmail, setCustomerEmail] = useState('')
-  const [orderDetails, setOrderDetails] = useState<any>(null)
+  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null)
   const searchParams = useSearchParams()
-  const router = useRouter()
   const sessionId = searchParams.get('session_id')
 
   useEffect(() => {
@@ -74,7 +79,7 @@ export default function ReturnPage() {
         <p className="text-gray-600 mb-4">Your payment was successful.</p>
         {customerEmail && (
           <p className="text-gray-600 mb-6">
-            We've sent a confirmation to <span className="font-medium">{customerEmail}</span>
+            We&apos;ve sent a confirmation to <span className="font-medium">{customerEmail}</span>
           </p>
         )}
         {orderDetails && (
@@ -96,5 +101,13 @@ export default function ReturnPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function ReturnPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-2xl">Loading...</div></div>}>
+      <ReturnContent />
+    </Suspense>
   )
 }

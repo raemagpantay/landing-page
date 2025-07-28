@@ -5,7 +5,7 @@ import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 
 if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY === undefined) {
@@ -13,10 +13,10 @@ if (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY === undefined) {
 }
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-export default function PaymentPage() {
-  const searchParams = useSearchParams();
+function PaymentContent() {
   const [amount, setAmount] = useState<number>(0);
   const [productName, setProductName] = useState<string>("");
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const amountParam = searchParams.get('amount');
@@ -67,3 +67,14 @@ export default function PaymentPage() {
     </main>
   );
 }
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-2xl">Loading payment...</div></div>}>
+      <PaymentContent />
+    </Suspense>
+  );
+}
+
+// Add this to make the page dynamic
+export const dynamic = 'force-dynamic';
