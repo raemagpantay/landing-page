@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Image from 'next/image';
+import CheckoutButton from '@/components/CheckoutButton';
 
 // Animation variants for section entrance
 const sectionVariants = {
@@ -333,6 +334,79 @@ export default function GameShowcase() {
               className="w-full h-full"
             ></iframe>
           </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Payment Section */}
+      <motion.section
+        className="bg-gradient-to-tr from-purple-900 to-blue-900 text-white py-20 px-6"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.h3
+            className="text-4xl md:text-5xl font-bold mb-6"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.1, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Get Premium Access
+          </motion.h3>
+          <motion.p
+            className="text-lg md:text-xl text-gray-300 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            Unlock exclusive content, early access to new features, and premium support for the ultimate gaming experience.
+          </motion.p>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            {/* Basic Package */}
+            <motion.div
+              className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h4 className="text-2xl font-bold mb-4 text-blue-400">Basic Package</h4>
+              <div className="text-3xl font-bold mb-4">$9.99</div>
+              <ul className="text-left text-gray-300 mb-6 space-y-2">
+                <li>✓ Full game access</li>
+                <li>✓ Basic support</li>
+                <li>✓ Regular updates</li>
+              </ul>
+              <CheckoutButton amount={9.99} productName="Basic Package" />
+            </motion.div>
+
+            {/* Premium Package */}
+            <motion.div
+              className="bg-gradient-to-b from-purple-800/50 to-blue-800/50 backdrop-blur-sm rounded-xl p-8 border border-purple-500 relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                POPULAR
+              </div>
+              <h4 className="text-2xl font-bold mb-4 text-purple-400">Premium Package</h4>
+              <div className="text-3xl font-bold mb-4">$19.99</div>
+              <ul className="text-left text-gray-300 mb-6 space-y-2">
+                <li>✓ Everything in Basic</li>
+                <li>✓ Early access to content</li>
+                <li>✓ Priority support</li>
+                <li>✓ Exclusive in-game items</li>
+                <li>✓ Developer insights</li>
+              </ul>
+              <CheckoutButton amount={19.99} productName="Premium Package" />
+            </motion.div>
+          </div>
         </div>
       </motion.section>
 
