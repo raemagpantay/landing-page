@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { applyActionCode, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/app/firebase/config';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function VerifyEmail() {
+function VerifyEmailContent() {
   const [status, setStatus] = useState('verifying'); // 'verifying', 'success', 'error'
   const [message, setMessage] = useState('Verifying your email...');
   const [isClient, setIsClient] = useState(false);
@@ -208,5 +208,25 @@ export default function VerifyEmail() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmail() {
+  return (
+    <Suspense fallback={
+      <div
+        className="min-h-screen flex flex-col bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      >
+        <div className="flex flex-1 items-center justify-center">
+          <div className="bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-400 mx-auto mb-4"></div>
+            <h1 className="text-white text-2xl mb-4">Loading...</h1>
+          </div>
+        </div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
