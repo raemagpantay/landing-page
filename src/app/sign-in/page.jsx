@@ -13,6 +13,7 @@ function SignIn() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [showAutoLoginMessage, setShowAutoLoginMessage] = useState(false);
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
 
@@ -32,6 +33,7 @@ function SignIn() {
       console.log('Found stored credentials, attempting auto-login...');
       setEmail(storedEmail);
       setPassword(storedPassword);
+      setShowAutoLoginMessage(true);
       
       // Auto-login attempt
       handleAutoLogin(storedEmail, storedPassword);
@@ -72,6 +74,7 @@ function SignIn() {
           router.push('/');
         } else {
           setError('Please verify your email before signing in. Check your inbox for the verification link.');
+          setShowAutoLoginMessage(false);
         }
       }
     } catch (e) {
@@ -81,6 +84,7 @@ function SignIn() {
         sessionStorage.removeItem('userEmail');
         sessionStorage.removeItem('tempPassword');
       }
+      setShowAutoLoginMessage(false);
     } finally {
       setIsLoading(false);
     }
@@ -118,6 +122,8 @@ function SignIn() {
         setError('Please enter a valid email address.');
       } else if (e.code === 'auth/too-many-requests') {
         setError('Too many failed attempts. Please try again later.');
+      } else if (e.code === 'auth/invalid-credential') {
+        setError('Invalid credentials. Please check your email and password.');
       } else {
         setError('Failed to sign in. Please check your credentials.');
       }
@@ -166,7 +172,7 @@ function SignIn() {
         <div className="bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96">
           <h1 className="text-white text-2xl mb-5">Sign In</h1>
 
-          {isClient && sessionStorage.getItem('userEmail') && (
+          {showAutoLoginMessage && (
             <div className="bg-blue-900/50 border border-blue-500 text-blue-100 px-4 py-3 rounded-lg mb-4">
               <p className="text-sm">Attempting to sign you in automatically...</p>
             </div>
@@ -187,10 +193,15 @@ function SignIn() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
             disabled={isLoading}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && email && password && !isLoading) {
+                handleSignIn();
+              }
+            }}
           />
 
           <p className="text-gray-400 text-sm mb-4">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <span
               onClick={() => router.push('/sign-up')}
               className="text-indigo-400 cursor-pointer hover:underline"
