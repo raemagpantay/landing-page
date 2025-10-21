@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
-import Link from 'next/link'; 
+import { sendEmailVerification } from 'firebase/auth';
+import Link from 'next/link';
 import Image from 'next/image';
 
 function SignUp() {
@@ -12,11 +13,14 @@ function SignUp() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
 
   const handleSignUp = async () => {
     setError('');
+    setSuccessMessage('');
+
     if (!email || !password) {
       setError('Please fill in all fields.');
       return;
@@ -32,12 +36,20 @@ function SignUp() {
         setError('An error occurred. Please try again.');
         return;
       }
-      console.log({ res });
-      sessionStorage.setItem('userEmail', res.user.email); // Store user email in sessionStorage
+
+      // Send email verification
+      await sendEmailVerification(res.user);
+
+      setSuccessMessage(
+        `A verification email has been sent to ${email}. Please check your inbox and verify your email before signing in.`
+      );
+
+      // Optionally store for later
+      sessionStorage.setItem('userEmail', res.user.email);
+
+      // Reset inputs
       setEmail('');
       setPassword('');
-      setError('');
-      router.push('/'); // Redirect to homepage after successful sign-up
     } catch (e) {
       if (e.code === 'auth/email-already-in-use') {
         setError('This email is already in use.');
@@ -57,7 +69,7 @@ function SignUp() {
       className="min-h-screen flex flex-col bg-cover bg-center"
       style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
     >
-      {/* Logo in a flex row at the top */}
+      {/* Logo */}
       <div className="py-6 px-6">
         <Link href="/">
           <Image
@@ -70,9 +82,16 @@ function SignUp() {
           />
         </Link>
       </div>
+
+      {/* Main Form */}
       <div className="flex flex-1 items-center justify-center">
-        <div className={`bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96 ${isModalOpen ? 'blur-sm' : ''}`}>
+        <div
+          className={`bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96 ${
+            isModalOpen ? 'blur-sm' : ''
+          }`}
+        >
           <h1 className="text-white text-2xl mb-5">Sign Up</h1>
+
           <input
             type="email"
             placeholder="Email"
@@ -87,6 +106,7 @@ function SignUp() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
           />
+
           <p className="text-gray-400 text-sm mb-4">
             Already have an account?{' '}
             <span
@@ -96,6 +116,7 @@ function SignUp() {
               Sign in
             </span>
           </p>
+
           <p className="text-gray-400 text-sm mb-4">
             By signing up, you agree to our{' '}
             <span
@@ -105,6 +126,7 @@ function SignUp() {
               terms and conditions
             </span>.
           </p>
+
           <div className="flex items-center mb-4">
             <input
               type="checkbox"
@@ -117,7 +139,10 @@ function SignUp() {
               I accept the terms and conditions
             </label>
           </div>
+
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {successMessage && <p className="text-green-400 text-sm mb-4">{successMessage}</p>}
+
           <button
             onClick={handleSignUp}
             className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500"
@@ -126,7 +151,7 @@ function SignUp() {
           </button>
         </div>
 
-        {/* Modal for Terms and Conditions */}
+        {/* Terms Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto relative">
@@ -135,52 +160,28 @@ function SignUp() {
                 Welcome to Planetary Deep-Sea Survival!
                 <br />
                 <br />
-                Please read these Terms and Conditions ("Terms") carefully before creating an account. By registering, accessing, or playing the Planetary Deep-Sea Survival game or using our website, you agree to be bound by these Terms.
+                Please read these Terms and Conditions carefully before creating an account.
+                By registering, accessing, or playing the game or using our website, you agree to be bound by these Terms.
                 <br />
                 <br />
                 <strong>1. Eligibility</strong>
                 <br />
-                You must be at least 13 years old to register. By signing up, you confirm that you meet the age requirement or have the permission of a parent or guardian.
+                You must be at least 13 years old to register.
                 <br />
                 <br />
-                <strong>2. Account Registration and Responsibility</strong>
+                <strong>2. Account Responsibility</strong>
                 <br />
-                You agree to provide accurate and complete information when creating your account. You are responsible for maintaining the confidentiality of your login credentials.
+                You agree to provide accurate and complete information when creating your account.
                 <br />
                 <br />
                 <strong>3. User Conduct</strong>
                 <br />
-                You agree not to use the game or website for any illegal or harmful activity. Cheating, exploiting bugs, or disrupting gameplay for others is strictly prohibited.
+                You agree not to use the game or website for any illegal or harmful activity.
                 <br />
                 <br />
                 <strong>4. Data Privacy</strong>
                 <br />
-                Your personal information will only be used for account management, gameplay features, and improvement of services. We do not share or sell user data to third parties.
-                <br />
-                <br />
-                <strong>5. Gameplay Progress and Updates</strong>
-                <br />
-                Game progress may be reset or affected by updates, bug fixes, or system changes.
-                <br />
-                <br />
-                <strong>6. Termination and Suspension</strong>
-                <br />
-                We reserve the right to suspend or terminate accounts that violate these Terms or are involved in suspicious activity.
-                <br />
-                <br />
-                <strong>7. Intellectual Property</strong>
-                <br />
-                All game assets, designs, and systems are property of the developers of Planetary Deep-Sea Survival.
-                <br />
-                <br />
-                <strong>8. Changes to Terms</strong>
-                <br />
-                These Terms may be updated at any time. Continued use of the game after updates constitutes acceptance of the revised Terms.
-                <br />
-                <br />
-                <strong>9. Contact</strong>
-                <br />
-                If you have questions or concerns about your account or these Terms, please contact us through the support page on our website.
+                Your personal information will only be used for account management, gameplay features, and service improvement.
               </p>
               <button
                 onClick={() => setIsModalOpen(false)}
