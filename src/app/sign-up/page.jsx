@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
-import Link from 'next/link';
+import Link from 'next/link'; 
 import Image from 'next/image';
 
 function SignUp() {
