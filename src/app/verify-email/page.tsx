@@ -10,10 +10,18 @@ import Image from 'next/image';
 export default function VerifyEmail() {
   const [status, setStatus] = useState('verifying'); // 'verifying', 'success', 'error'
   const [message, setMessage] = useState('Verifying your email...');
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   
+  // Ensure we're on the client side before accessing sessionStorage
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  useEffect(() => {
+    if (!isClient) return; // Don't run on server
+
     const handleEmailVerification = async () => {
       const actionCode = searchParams.get('oobCode');
       const mode = searchParams.get('mode');
@@ -105,7 +113,24 @@ export default function VerifyEmail() {
     handleEmailVerification();
 
     return () => unsubscribe();
-  }, [searchParams, router, status]);
+  }, [searchParams, router, status, isClient]);
+
+  // Show loading until client-side hydration
+  if (!isClient) {
+    return (
+      <div
+        className="min-h-screen flex flex-col bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      >
+        <div className="flex flex-1 items-center justify-center">
+          <div className="bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-400 mx-auto mb-4"></div>
+            <h1 className="text-white text-2xl mb-4">Loading...</h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -116,8 +141,8 @@ export default function VerifyEmail() {
       <div className="py-6 px-6">
         <Link href="/">
           <Image
-            src="/favicon.ico"
-            alt="Home"
+            src="/images/favicontrashbin.ico"
+            alt="Salvage Protocol"
             width={48}
             height={48}
             className="rounded-full hover:scale-110 transition"

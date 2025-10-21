@@ -12,10 +12,18 @@ function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
 
+  // Ensure we're on the client side before accessing sessionStorage
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return; // Don't run on server
+
     // Check for stored credentials (from successful email verification)
     const storedEmail = sessionStorage.getItem('userEmail');
     const storedPassword = sessionStorage.getItem('tempPassword');
@@ -34,15 +42,17 @@ function SignIn() {
       if (user && user.emailVerified) {
         console.log('User is authenticated and verified:', user.email);
         // Clean up stored credentials
-        sessionStorage.removeItem('userEmail');
-        sessionStorage.removeItem('tempPassword');
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('userEmail');
+          sessionStorage.removeItem('tempPassword');
+        }
         // Redirect to homepage
         router.push('/');
       }
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, [router, isClient]);
 
   const handleAutoLogin = async (userEmail, userPassword) => {
     try {
@@ -54,8 +64,10 @@ function SignIn() {
         if (res.user.emailVerified) {
           console.log('Auto-login successful, redirecting to homepage...');
           // Clean up storage
-          sessionStorage.removeItem('userEmail');
-          sessionStorage.removeItem('tempPassword');
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('userEmail');
+            sessionStorage.removeItem('tempPassword');
+          }
           // Redirect to homepage
           router.push('/');
         } else {
@@ -65,8 +77,10 @@ function SignIn() {
     } catch (e) {
       console.error('Auto-login failed:', e);
       // Don't show error for auto-login failure, let user try manually
-      sessionStorage.removeItem('userEmail');
-      sessionStorage.removeItem('tempPassword');
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('tempPassword');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -112,6 +126,22 @@ function SignIn() {
     }
   };
 
+  // Show loading spinner until client-side hydration is complete
+  if (!isClient) {
+    return (
+      <div
+        className="min-h-screen flex flex-col bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      >
+        <div className="flex flex-1 items-center justify-center">
+          <div className="bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-400 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="min-h-screen flex flex-col bg-cover bg-center"
@@ -136,7 +166,7 @@ function SignIn() {
         <div className="bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96">
           <h1 className="text-white text-2xl mb-5">Sign In</h1>
 
-          {sessionStorage.getItem('userEmail') && (
+          {isClient && sessionStorage.getItem('userEmail') && (
             <div className="bg-blue-900/50 border border-blue-500 text-blue-100 px-4 py-3 rounded-lg mb-4">
               <p className="text-sm">Attempting to sign you in automatically...</p>
             </div>
