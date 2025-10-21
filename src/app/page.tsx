@@ -61,7 +61,7 @@ export default function GameShowcase() {
       {/* Hero Section with parallax and animated glow */}
       <section
         className="min-h-screen bg-cover bg-center text-white px-6 py-20 flex flex-col items-center text-center relative overflow-hidden"
-        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+        style={{ backgroundImage: "url('/images/TrashArt-bg.jpg')" }}
       >
         {/* Parallax overlay effect */}
         <motion.div
@@ -87,9 +87,9 @@ export default function GameShowcase() {
           {/* Multi-line animated game title */}
           <div className="select-none">
             {[
-              { text: "PLANETARY", color: "text-red-500" },
-              { text: "DEEP SEA", color: "text-blue-400" },
-              { text: "SURVIVAL", color: "text-yellow-400" }
+              { text: "SALVAGE", color: "text-red-500" },
+              { text: "PROTOCOL", color: "text-blue-400" },
+              { text: "GAME", color: "text-yellow-400" }
             ].map((line, idx) => (
               <div
                 key={line.text}
@@ -222,15 +222,16 @@ export default function GameShowcase() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
           >
-            <h3 className="text-3xl font-semibold mb-4 text-blue-400"> Game Features</h3>
+            <h3 className="text-3xl font-semibold mb-4 text-blue-400">Environmental Cleanup Features</h3>
             <p className="text-gray-300 mb-4">
-              Planetary Deep-Sea Survival is a thrilling underwater adventure game that combines exploration, survival, and strategy.
+              Salvage Protocol is an innovative environmental action game where you clean polluted waters and restore marine ecosystems through strategic waste management.
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Explore vast underwater landscapes filled with hidden treasures and dangers.</li>
-              <li>Craft tools and equipment to survive the harsh ocean environment.</li>
-              <li>Encounter unique marine life, from friendly creatures to hostile predators.</li>
-              <li>Uncover the mysteries of a lost civilization beneath the waves.</li>
+              <li>Advanced trash sorting and recycling mechanics with multiple waste categories.</li>
+              <li>Deploy specialized cleanup equipment to tackle different types of pollution.</li>
+              <li>Restore coral reefs and marine habitats by removing plastic debris and toxic waste.</li>
+              <li>Learn real-world environmental facts while making a positive impact in-game.</li>
+              <li>Challenge friends in cooperative cleanup missions and pollution prevention campaigns.</li>
             </ul>
           </motion.div>
           <motion.div
@@ -240,7 +241,7 @@ export default function GameShowcase() {
           >
             <Image
               src="/images/screenshot1.jpg"
-              alt="Gameplay Preview"
+              alt="Environmental Cleanup Gameplay"
               className="w-full h-full object-cover"
               width={1920}
               height={1080}
@@ -265,7 +266,7 @@ export default function GameShowcase() {
           >
             <Image
               src="/images/screenshot4.jpg"
-              alt="Gameplay Screenshot"
+              alt="Waste Segregation Interface"
               className="w-full h-full object-cover"
               width={1920}
               height={1080}
@@ -277,15 +278,16 @@ export default function GameShowcase() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
           >
-            <h3 className="text-3xl font-semibold mb-4 text-green-400"> Game Screenshots</h3>
+            <h3 className="text-3xl font-semibold mb-4 text-green-400">Waste Management System</h3>
             <p className="text-gray-300 mb-4">
-              Immerse yourself in the stunning visuals of Planetary Deep-Sea Survival. Every detail is crafted to bring the underwater world to life.
+              Experience detailed waste segregation mechanics that teach real-world environmental responsibility while creating engaging gameplay challenges.
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Dynamic lighting and realistic water effects.</li>
-              <li>Beautifully designed marine environments.</li>
-              <li>Detailed character and creature animations.</li>
-              <li>Interactive objects and puzzles to solve.</li>
+              <li>Interactive sorting interface for plastics, metals, organic waste, and hazardous materials.</li>
+              <li>Time-based challenges that reward proper waste categorization and recycling efficiency.</li>
+              <li>Visual transformation of polluted areas as you successfully clean and organize debris.</li>
+              <li>Educational pop-ups explaining the environmental impact of different waste types.</li>
+              <li>Achievement system that tracks your environmental impact and cleanup progress.</li>
             </ul>
           </motion.div>
         </div>
@@ -316,7 +318,7 @@ export default function GameShowcase() {
             transition={{ duration: 1.1, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            Get a glimpse of the adventure that awaits you in Planetary Deep-Sea Survival. Watch the trailer and dive into the action!
+            See how environmental action meets engaging gameplay in Salvage Protocol. Watch the trailer and join the cleanup mission!
           </motion.p>
           <motion.div
             className="rounded-xl overflow-hidden shadow-lg bg-gray-800 aspect-video flex items-center justify-center text-gray-500"
