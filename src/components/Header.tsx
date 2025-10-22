@@ -90,8 +90,8 @@ export default function Header() {
               <Image
                 src="/images/favicontrashbin.ico"
                 alt="Salvage Protocol - Environmental Cleanup Game"
-                width={60}
-                height={60} 
+                width={80}
+                height={80} 
                 className="h-20 w-20 hover:scale-105 transition-transform duration-200"
                 priority
                 onError={() => setImageError(true)}
