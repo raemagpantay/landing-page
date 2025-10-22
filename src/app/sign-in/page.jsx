@@ -137,7 +137,7 @@ function SignIn() {
     return (
       <div
         className="min-h-screen flex flex-col bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+        style={{ backgroundImage: "url('/images/TrashArt-bg.jpg')" }}
       >
         <div className="flex flex-1 items-center justify-center">
           <div className="bg-gray-800 bg-opacity-90 p-10 rounded-lg shadow-xl w-96">
@@ -151,7 +151,7 @@ function SignIn() {
   return (
     <div
       className="min-h-screen flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      style={{ backgroundImage: "url('/images/TrashArt-bg.jpg')" }}
     >
       {/* Logo */}
       <div className="py-6 px-6">

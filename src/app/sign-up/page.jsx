@@ -97,7 +97,7 @@ function SignUp() {
   return (
     <div
       className="min-h-screen flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      style={{ backgroundImage: "url('/images/TrashArt-bg.jpg')" }}
     >
       {/* Logo section in sign-up page */}
       <div className="py-6 px-6">
