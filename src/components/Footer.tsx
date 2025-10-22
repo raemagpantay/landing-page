@@ -47,7 +47,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="text-xs text-gray-400">
-          &copy; {new Date().getFullYear()} PLANETARY DEEP-SEA SURVIVAL. All Rights Reserved.
+          &copy; {new Date().getFullYear()} SALVAGE PROTOCOL. All Rights Reserved.
         </div>
       </div>
     </footer>
