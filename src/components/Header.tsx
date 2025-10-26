@@ -235,26 +235,6 @@ export default function Header() {
                             Shop
                           </Link>
                         </li>
-                        <li>
-                          <Link
-                            href="/Admin"
-                            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white transition-colors"
-                            onClick={() => setDropdownOpen(false)}
-                          >
-                            <svg
-                              className="w-4 h-4 mr-3"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Admin Panel
-                          </Link>
-                        </li>
                         <li className="border-t border-gray-100 dark:border-gray-600">
                           <button
                             onClick={handleSignOut}
