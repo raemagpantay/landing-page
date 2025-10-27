@@ -207,7 +207,7 @@ function SignUp() {
                     <p className="text-sm">{successMessage}</p>
                   </div>
                 )}
-
+                
                 <div className="space-y-3">
                   <button
                     onClick={handleGoToSignIn}
