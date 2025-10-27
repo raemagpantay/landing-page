@@ -10,6 +10,7 @@ import Image from 'next/image';
 function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [error, setError] = useState('');
@@ -24,11 +25,18 @@ function SignUp() {
     setSuccessMessage('');
     setIsLoading(true);
 
-    if (!email || !password) {
+    if (!email || !password || !confirmPassword) {
       setError('Please fill in all fields.');
       setIsLoading(false);
       return;
     }
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      setIsLoading(false);
+      return;
+    }
+    
     if (!isTermsAccepted) {
       setError('You must accept the terms and conditions to sign up.');
       setIsLoading(false);
@@ -67,6 +75,7 @@ function SignUp() {
       // Reset inputs
       setEmail('');
       setPassword('');
+      setConfirmPassword('');
       setIsTermsAccepted(false);
 
       console.log('Sign-up process completed successfully');
@@ -140,6 +149,14 @@ function SignUp() {
                 className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
                 disabled={isLoading}
               />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
+                disabled={isLoading}
+              />
 
               <p className="text-gray-400 text-sm mb-4">
                 Already have an account?{' '}
@@ -184,7 +201,7 @@ function SignUp() {
               <button
                 onClick={handleSignUp}
                 className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!email || !password || !isTermsAccepted || isLoading}
+                disabled={!email || !password || !confirmPassword || !isTermsAccepted || isLoading}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
