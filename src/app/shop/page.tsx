@@ -8,7 +8,7 @@ export default function Shop() {
   return (
     <div
       className="min-h-screen flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      style={{ backgroundImage: "url('/images/TrashArt-bg.jpg')" }}
     >
       {/* Logo in a flex row at the top */}
       <div className="py-6 px-6">
