@@ -440,4 +440,4 @@ if (!admin.apps.length) {
 
 const adminAuth = admin;
 
-export default adminAuth;
+export { adminAuth };
