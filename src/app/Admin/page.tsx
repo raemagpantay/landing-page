@@ -89,7 +89,6 @@ export default function AdminDashboard() {
       });
 
       if (res.ok) {
-        const data = await res.json();
         setStatus(`✅ User account ${currentlyDisabled ? 'enabled' : 'disabled'} successfully.`);
         
         // Refresh users list

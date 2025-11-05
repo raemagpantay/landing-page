@@ -32,19 +32,21 @@ export async function POST(req: NextRequest) {
       uid,
       disabled,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error archiving user:', error);
     
     // Handle specific Firebase errors
-    if (error.code === 'auth/user-not-found') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'auth/user-not-found') {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
     
+    const errorMessage = error instanceof Error ? error.message : 'Failed to archive user';
+    
     return NextResponse.json(
-      { error: error.message || 'Failed to archive user' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
