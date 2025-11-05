@@ -9,6 +9,7 @@ interface User {
   displayName?: string;
   createdAt: string;
   lastLoginAt?: string;
+  disabled?: boolean;
 }
 
 export default function AdminDashboard() {
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState<string | null>(null);
+  const [archivingUserId, setArchivingUserId] = useState<string | null>(null);
   const router = useRouter();
 
   // Fetch the current ZIP file name on component mount
@@ -41,31 +43,71 @@ export default function AdminDashboard() {
   }, []);
 
   // Fetch registered users from Firebase
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setUsersLoading(true);
-        setUsersError(null);
-        
-        const res = await fetch('/api/get-users');
-        
-        if (res.ok) {
-          const data = await res.json();
-          setUsers(data.users || []);
-        } else {
-          const errorData = await res.json();
-          setUsersError(errorData.error || 'Failed to fetch users');
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        setUsersError('An error occurred while fetching users');
-      } finally {
-        setUsersLoading(false);
+  const fetchUsers = async () => {
+    try {
+      setUsersLoading(true);
+      setUsersError(null);
+      
+      const res = await fetch('/api/get-users');
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users || []);
+      } else {
+        const errorData = await res.json();
+        setUsersError(errorData.error || 'Failed to fetch users');
       }
-    };
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setUsersError('An error occurred while fetching users');
+    } finally {
+      setUsersLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleArchiveUser = async (uid: string, currentlyDisabled: boolean) => {
+    if (!confirm(`Are you sure you want to ${currentlyDisabled ? 'enable' : 'disable'} this user account?`)) {
+      return;
+    }
+
+    try {
+      setArchivingUserId(uid);
+      
+      const res = await fetch('/api/archive-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          uid, 
+          disabled: !currentlyDisabled 
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setStatus(`✅ User account ${currentlyDisabled ? 'enabled' : 'disabled'} successfully.`);
+        
+        // Refresh users list
+        await fetchUsers();
+        
+        // Clear status after 3 seconds
+        setTimeout(() => setStatus(''), 3000);
+      } else {
+        const errorData = await res.json();
+        setStatus(`❌ Failed to ${currentlyDisabled ? 'enable' : 'disable'} user: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Error archiving user:', error);
+      setStatus('❌ An error occurred while archiving the user.');
+    } finally {
+      setArchivingUserId(null);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -133,6 +175,9 @@ export default function AdminDashboard() {
       return 'Invalid Date';
     }
   };
+
+  const activeUsersCount = users.filter(user => !user.disabled).length;
+  const archivedUsersCount = users.filter(user => user.disabled).length;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-10">
@@ -204,15 +249,23 @@ export default function AdminDashboard() {
                 <p className="text-sm text-gray-300">Total Users</p>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg text-center">
-                <h3 className="text-2xl font-bold text-green-400">
+                <h3 className="text-2xl font-bold text-green-400">{activeUsersCount}</h3>
+                <p className="text-sm text-gray-300">Active Users</p>
+              </div>
+              <div className="bg-gray-700 p-4 rounded-lg text-center">
+                <h3 className="text-2xl font-bold text-yellow-400">
                   {users.filter(user => {
                     const lastLogin = user.lastLoginAt;
-                    if (!lastLogin) return false;
+                    if (!lastLogin || user.disabled) return false;
                     const daysSinceLogin = (Date.now() - new Date(lastLogin).getTime()) / (1000 * 60 * 60 * 24);
                     return daysSinceLogin <= 7;
                   }).length}
                 </h3>
                 <p className="text-sm text-gray-300">Active (7 days)</p>
+              </div>
+              <div className="bg-gray-700 p-4 rounded-lg text-center">
+                <h3 className="text-2xl font-bold text-orange-400">{archivedUsersCount}</h3>
+                <p className="text-sm text-gray-300">Archived Users</p>
               </div>
             </div>
           </div>
@@ -223,7 +276,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Registered Users</h2>
             <button
-              onClick={() => window.location.reload()}
+              onClick={fetchUsers}
               className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-medium transition"
             >
               Refresh Data
@@ -255,11 +308,12 @@ export default function AdminDashboard() {
                     <th className="py-3 px-4 font-semibold text-gray-300">Registered</th>
                     <th className="py-3 px-4 font-semibold text-gray-300">Last Login</th>
                     <th className="py-3 px-4 font-semibold text-gray-300">Status</th>
+                    <th className="py-3 px-4 font-semibold text-gray-300">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.map((user, index) => {
-                    const isRecentlyActive = user.lastLoginAt && 
+                    const isRecentlyActive = user.lastLoginAt && !user.disabled &&
                       (Date.now() - new Date(user.lastLoginAt).getTime()) < (7 * 24 * 60 * 60 * 1000);
                     
                     return (
@@ -267,7 +321,7 @@ export default function AdminDashboard() {
                         key={user.uid} 
                         className={`border-b border-gray-700 hover:bg-gray-700/50 transition-colors ${
                           index % 2 === 0 ? 'bg-gray-800/50' : 'bg-gray-900/50'
-                        }`}
+                        } ${user.disabled ? 'opacity-60' : ''}`}
                       >
                         <td className="py-3 px-4">
                           <div className="font-medium text-blue-300">{user.email}</div>
@@ -291,13 +345,37 @@ export default function AdminDashboard() {
                         <td className="py-3 px-4">
                           <span 
                             className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              isRecentlyActive 
+                              user.disabled
+                                ? 'bg-red-900/50 text-red-300 border border-red-500/50'
+                                : isRecentlyActive 
                                 ? 'bg-green-900/50 text-green-300 border border-green-500/50' 
                                 : 'bg-gray-700/50 text-gray-400 border border-gray-600/50'
                             }`}
                           >
-                            {isRecentlyActive ? 'Active' : 'Inactive'}
+                            {user.disabled ? 'Archived' : isRecentlyActive ? 'Active' : 'Inactive'}
                           </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => handleArchiveUser(user.uid, user.disabled || false)}
+                            disabled={archivingUserId === user.uid}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
+                              user.disabled
+                                ? 'bg-green-600 hover:bg-green-500 text-white'
+                                : 'bg-orange-600 hover:bg-orange-500 text-white'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            {archivingUserId === user.uid ? (
+                              <div className="flex items-center">
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                Processing...
+                              </div>
+                            ) : user.disabled ? (
+                              'Enable'
+                            ) : (
+                              'Archive'
+                            )}
+                          </button>
                         </td>
                       </tr>
                     );
