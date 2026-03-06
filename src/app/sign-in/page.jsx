@@ -40,7 +40,7 @@ function SignIn() {
     }
 
     // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.emailVerified) {
         console.log('User is authenticated and verified:', user.email);
         // Clean up stored credentials
@@ -48,13 +48,42 @@ function SignIn() {
           sessionStorage.removeItem('userEmail');
           sessionStorage.removeItem('tempPassword');
         }
-        // Redirect to homepage
-        router.push('/');
+        // Check admin status and redirect accordingly
+        await checkAdminAndRedirect(user);
       }
     });
 
     return () => unsubscribe();
   }, [router, isClient]);
+
+  const checkAdminAndRedirect = async (user) => {
+    try {
+      // Check if user is an admin
+      const res = await fetch('/api/check-admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uid: user.uid }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.isAdmin) {
+          console.log('Admin user detected, redirecting to admin dashboard...');
+          router.push('/Admin');
+          return;
+        }
+      }
+      
+      // If not admin or check failed, redirect to homepage
+      router.push('/');
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      // On error, default to homepage
+      router.push('/');
+    }
+  };
 
   const handleAutoLogin = async (userEmail, userPassword) => {
     try {
@@ -64,14 +93,14 @@ function SignIn() {
       const res = await signInWithEmailAndPassword(userEmail, userPassword);
       if (res && res.user) {
         if (res.user.emailVerified) {
-          console.log('Auto-login successful, redirecting to homepage...');
+          console.log('Auto-login successful, checking admin status...');
           // Clean up storage
           if (typeof window !== 'undefined') {
             sessionStorage.removeItem('userEmail');
             sessionStorage.removeItem('tempPassword');
           }
-          // Redirect to homepage
-          router.push('/');
+          // Check admin status and redirect accordingly
+          await checkAdminAndRedirect(res.user);
         } else {
           setError('Please verify your email before signing in. Check your inbox for the verification link.');
           setShowAutoLoginMessage(false);
@@ -104,8 +133,8 @@ function SignIn() {
       const res = await signInWithEmailAndPassword(email, password);
       if (res && res.user) {
         if (res.user.emailVerified) {
-          console.log('Sign-in successful, redirecting to homepage...');
-          router.push('/');
+          console.log('Sign-in successful, checking admin status...');
+          await checkAdminAndRedirect(res.user);
         } else {
           setError('Please verify your email before signing in. Check your inbox for the verification link.');
         }
