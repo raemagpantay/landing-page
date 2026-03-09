@@ -8,9 +8,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 function SignUp() {
+  const MINIMUM_AGE = 18;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [error, setError] = useState('');
@@ -20,13 +22,58 @@ function SignUp() {
   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
 
+  const getAgeFromBirthDate = (dateString) => {
+    const today = new Date();
+    const birth = new Date(dateString);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDifference = today.getMonth() - birth.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+      age -= 1;
+    }
+
+    return age;
+  };
+
+  const getSignUpErrorMessage = (firebaseCode, fallbackMessage) => {
+    switch (firebaseCode) {
+      case 'auth/email-already-in-use':
+        return 'This email is already registered. Please sign in or use another email.';
+      case 'auth/weak-password':
+        return 'Password is too weak. Use at least 6 characters.';
+      case 'auth/invalid-email':
+        return 'Email address format is invalid.';
+      case 'auth/operation-not-allowed':
+        return 'Email/password sign-up is currently disabled. Please contact support.';
+      case 'auth/network-request-failed':
+        return 'Network error. Check your internet connection and try again.';
+      case 'auth/too-many-requests':
+        return 'Too many attempts right now. Please wait and try again.';
+      default:
+        return `Sign-up failed: ${fallbackMessage || 'Unknown error occurred.'}`;
+    }
+  };
+
   const handleSignUp = async () => {
     setError('');
     setSuccessMessage('');
     setIsLoading(true);
 
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !birthDate) {
       setError('Please fill in all fields.');
+      setIsLoading(false);
+      return;
+    }
+
+    const age = getAgeFromBirthDate(birthDate);
+    if (Number.isNaN(age)) {
+      setError('Please enter a valid birth date.');
+      setIsLoading(false);
+      return;
+    }
+
+    if (age < MINIMUM_AGE) {
+      setError(`You must be at least ${MINIMUM_AGE} years old to create an account.`);
       setIsLoading(false);
       return;
     }
@@ -76,21 +123,14 @@ function SignUp() {
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+      setBirthDate('');
       setIsTermsAccepted(false);
 
       console.log('Sign-up process completed successfully');
     } catch (e) {
       console.error('Sign-up error:', e);
-      
-      if (e.code === 'auth/email-already-in-use') {
-        setError('This email is already in use. Please try signing in instead.');
-      } else if (e.code === 'auth/weak-password') {
-        setError('Password should be at least 6 characters.');
-      } else if (e.code === 'auth/invalid-email') {
-        setError('Please enter a valid email address.');
-      } else {
-        setError(`An error occurred during sign-up: ${e.message || 'Please try again.'}`);
-      }
+
+      setError(getSignUpErrorMessage(e.code, e.message));
     } finally {
       setIsLoading(false);
     }
@@ -157,6 +197,15 @@ function SignUp() {
                 className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
                 disabled={isLoading}
               />
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white"
+                disabled={isLoading}
+                max={new Date().toISOString().split('T')[0]}
+              />
+              <p className="text-gray-400 text-xs mb-4">You must be at least {MINIMUM_AGE} years old.</p>
 
               <p className="text-gray-400 text-sm mb-4">
                 Already have an account?{' '}
@@ -201,7 +250,7 @@ function SignUp() {
               <button
                 onClick={handleSignUp}
                 className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!email || !password || !confirmPassword || !isTermsAccepted || isLoading}
+                disabled={!email || !password || !confirmPassword || !birthDate || !isTermsAccepted || isLoading}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
@@ -267,7 +316,7 @@ function SignUp() {
                 <br />
                 <strong>1. Eligibility</strong>
                 <br />
-                You must be at least 13 years old to register.
+                You must be at least 18 years old to register.
                 <br />
                 <br />
                 <strong>2. Account Responsibility</strong>

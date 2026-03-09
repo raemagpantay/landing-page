@@ -8,14 +8,49 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 function SignIn() {
+  const MINIMUM_AGE = 13;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [showAutoLoginMessage, setShowAutoLoginMessage] = useState(false);
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
+
+  const getAgeFromBirthDate = (dateString) => {
+    const today = new Date();
+    const birth = new Date(dateString);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDifference = today.getMonth() - birth.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+      age -= 1;
+    }
+
+    return age;
+  };
+
+  const getSignInErrorMessage = (firebaseCode, fallbackMessage) => {
+    switch (firebaseCode) {
+      case 'auth/user-not-found':
+      case 'auth/invalid-credential':
+        return 'No account matched these credentials. Check your email and password.';
+      case 'auth/wrong-password':
+        return 'Password is incorrect for this account.';
+      case 'auth/invalid-email':
+        return 'Email address format is invalid.';
+      case 'auth/user-disabled':
+        return 'This account has been disabled. Contact support for help.';
+      case 'auth/too-many-requests':
+        return 'Too many failed attempts. Please wait before trying again.';
+      case 'auth/network-request-failed':
+        return 'Network error. Check your internet connection and try again.';
+      default:
+        return `Sign-in failed: ${fallbackMessage || 'Unknown error occurred.'}`;
+    }
+  };
 
   // Ensure we're on the client side before accessing sessionStorage
   useEffect(() => {
@@ -108,6 +143,7 @@ function SignIn() {
       }
     } catch (e) {
       console.error('Auto-login failed:', e);
+      setError(getSignInErrorMessage(e.code, e.message));
       // Don't show error for auto-login failure, let user try manually
       if (typeof window !== 'undefined') {
         sessionStorage.removeItem('userEmail');
@@ -123,8 +159,21 @@ function SignIn() {
     setError('');
     setIsLoading(true);
 
-    if (!email || !password) {
+    if (!email || !password || !birthDate) {
       setError('Please fill in all fields.');
+      setIsLoading(false);
+      return;
+    }
+
+    const age = getAgeFromBirthDate(birthDate);
+    if (Number.isNaN(age)) {
+      setError('Please enter a valid birth date.');
+      setIsLoading(false);
+      return;
+    }
+
+    if (age < MINIMUM_AGE) {
+      setError(`You must be at least ${MINIMUM_AGE} years old to sign in.`);
       setIsLoading(false);
       return;
     }
@@ -143,19 +192,7 @@ function SignIn() {
       }
     } catch (e) {
       console.error('Sign-in error:', e);
-      if (e.code === 'auth/user-not-found') {
-        setError('No account found with this email.');
-      } else if (e.code === 'auth/wrong-password') {
-        setError('Incorrect password.');
-      } else if (e.code === 'auth/invalid-email') {
-        setError('Please enter a valid email address.');
-      } else if (e.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Please try again later.');
-      } else if (e.code === 'auth/invalid-credential') {
-        setError('Invalid credentials. Please check your email and password.');
-      } else {
-        setError('Failed to sign in. Please check your credentials.');
-      }
+      setError(getSignInErrorMessage(e.code, e.message));
     } finally {
       setIsLoading(false);
     }
@@ -228,6 +265,15 @@ function SignIn() {
               }
             }}
           />
+          <input
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+            className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white"
+            disabled={isLoading}
+            max={new Date().toISOString().split('T')[0]}
+          />
+          <p className="text-gray-400 text-xs mb-4">Age verification: you must be at least {MINIMUM_AGE} years old.</p>
 
           <p className="text-gray-400 text-sm mb-4">
             Don&apos;t have an account?{' '}
@@ -248,7 +294,7 @@ function SignIn() {
           <button
             onClick={handleSignIn}
             className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!email || !password || isLoading}
+            disabled={!email || !password || !birthDate || isLoading}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">

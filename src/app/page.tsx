@@ -30,9 +30,27 @@ function useParallax(offset = 30) {
 }
 
 export default function GameShowcase() {
+  const MINIMUM_AGE = 18;
   const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const [showAgeVerificationModal, setShowAgeVerificationModal] = useState(false);
+  const [downloadBirthDate, setDownloadBirthDate] = useState('');
+  const [downloadAgeError, setDownloadAgeError] = useState('');
+  const [isDownloadAgeVerified, setIsDownloadAgeVerified] = useState(false);
   const [user] = useAuthState(auth);
   const router = useRouter();
+
+  const getAgeFromBirthDate = (dateString: string) => {
+    const today = new Date();
+    const birth = new Date(dateString);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDifference = today.getMonth() - birth.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+      age -= 1;
+    }
+
+    return age;
+  };
 
   // Fetch the current ZIP file name on component mount
   useEffect(() => {
@@ -50,6 +68,57 @@ export default function GameShowcase() {
 
     fetchCurrentFile();
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const hasVerifiedAge = sessionStorage.getItem('downloadAgeVerified18') === 'true';
+    setIsDownloadAgeVerified(hasVerifiedAge);
+  }, []);
+
+  const handleDownloadClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!currentFile) {
+      event.preventDefault();
+      return;
+    }
+
+    if (!isDownloadAgeVerified) {
+      event.preventDefault();
+      setDownloadAgeError('');
+      setShowAgeVerificationModal(true);
+    }
+  };
+
+  const confirmDownloadAge = () => {
+    if (!downloadBirthDate) {
+      setDownloadAgeError('Please select your birth date to continue.');
+      return;
+    }
+
+    const age = getAgeFromBirthDate(downloadBirthDate);
+    if (Number.isNaN(age)) {
+      setDownloadAgeError('Please enter a valid birth date.');
+      return;
+    }
+
+    if (age < MINIMUM_AGE) {
+      setDownloadAgeError(`You must be at least ${MINIMUM_AGE} years old to download the game.`);
+      return;
+    }
+
+    setIsDownloadAgeVerified(true);
+    setShowAgeVerificationModal(false);
+    setDownloadAgeError('');
+
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('downloadAgeVerified18', 'true');
+      if (currentFile) {
+        window.location.href = `/uploads/${currentFile}`;
+      }
+    }
+  };
 
   // Parallax for hero
   const parallax = useParallax(18);
@@ -170,6 +239,7 @@ export default function GameShowcase() {
               <a
                 href={currentFile ? `/uploads/${currentFile}` : "#"}
                 download
+                onClick={handleDownloadClick}
                 className={`restart-btn relative -rotate-6 w-64 h-16 flex items-center justify-center text-2xl font-bold uppercase tracking-widest border-4 border-cyan-400 rounded-full bg-transparent select-none transition-all duration-200 hover:bg-cyan-400/10 hover:scale-105 active:scale-95 ${
                   currentFile
                     ? "cursor-pointer"
@@ -203,9 +273,62 @@ export default function GameShowcase() {
                 ))}
               </a>
             )}
+
+            {user && !isDownloadAgeVerified && (
+              <p className="mt-4 text-xs text-gray-300">
+                Download requires age verification ({MINIMUM_AGE}+).
+              </p>
+            )}
           </motion.div>
         </motion.div>
       </section>
+
+      {showAgeVerificationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="w-full max-w-md rounded-xl border border-cyan-500/40 bg-gray-900 p-6 shadow-2xl">
+            <h3 className="mb-3 text-xl font-bold text-white">Age Verification Required</h3>
+            <p className="mb-4 text-sm text-gray-300">
+              You must be at least {MINIMUM_AGE} years old to download the game.
+            </p>
+
+            <label htmlFor="download-birth-date" className="mb-2 block text-sm text-gray-300">
+              Birth date
+            </label>
+            <input
+              id="download-birth-date"
+              type="date"
+              value={downloadBirthDate}
+              onChange={(e) => setDownloadBirthDate(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
+              className="mb-3 w-full rounded bg-gray-800 p-3 text-white outline-none"
+            />
+
+            {downloadAgeError && (
+              <div className="mb-3 rounded border border-red-500 bg-red-900/40 px-3 py-2 text-sm text-red-100">
+                {downloadAgeError}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowAgeVerificationModal(false);
+                  setDownloadAgeError('');
+                }}
+                className="w-full rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDownloadAge}
+                className="w-full rounded bg-cyan-600 px-4 py-2 text-white hover:bg-cyan-500"
+              >
+                Verify and Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Game Features Section with animated entrance */}
       <motion.section
