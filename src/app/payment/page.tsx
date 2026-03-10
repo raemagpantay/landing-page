@@ -19,11 +19,13 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 function PaymentContent() {
   const [amount, setAmount] = useState<number>(0);
   const [productName, setProductName] = useState<string>("");
+  const [currency, setCurrency] = useState<"usd" | "php">("usd");
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const amountParam = searchParams.get('amount');
     const nameParam = searchParams.get('name');
+    const currencyParam = searchParams.get('currency');
     
     if (amountParam) {
       setAmount(parseFloat(amountParam));
@@ -31,7 +33,12 @@ function PaymentContent() {
     if (nameParam) {
       setProductName(nameParam);
     }
+    if (currencyParam === 'php' || currencyParam === 'usd') {
+      setCurrency(currencyParam);
+    }
   }, [searchParams]);
+
+  const currencySymbol = currency === 'php' ? 'P' : '$';
 
   // Check if Stripe is available
   if (!stripePromise) {
@@ -68,7 +75,7 @@ function PaymentContent() {
         <h1 className="text-4xl font-extrabold mb-2">Complete Your Purchase</h1>
         <h2 className="text-2xl">
           {productName && `${productName} - `}
-          <span className="font-bold">${amount}</span>
+          <span className="font-bold">{currencySymbol}{amount}</span>
         </h2>
       </div>
 
@@ -77,10 +84,10 @@ function PaymentContent() {
         options={{
           mode: "payment",
           amount: convertToSubcurrency(amount),
-          currency: "usd",
+          currency,
         }}
       >
-        <CheckoutPage amount={amount} />
+        <CheckoutPage amount={amount} currency={currency} />
       </Elements>
     </main>
   );

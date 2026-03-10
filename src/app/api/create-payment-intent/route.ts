@@ -1,26 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-// Check if the Stripe secret key is available
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined in environment variables");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-06-30.basil",
-});
-
 export async function POST(request: NextRequest) {
   try {
-    // Check if Stripe is properly initialized
-    if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json(
-        { error: "Stripe is not properly configured" },
+        { error: "Payment system unavailable: missing STRIPE_SECRET_KEY" },
         { status: 500 }
       );
     }
 
-    const { amount } = await request.json();
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-06-30.basil",
+    });
+
+    const { amount, currency } = await request.json();
+    const selectedCurrency = currency === "php" ? "php" : "usd";
 
     // Validate amount
     if (!amount || amount <= 0) {
@@ -32,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
-      currency: "usd",
+      currency: selectedCurrency,
       automatic_payment_methods: { enabled: true },
     });
 

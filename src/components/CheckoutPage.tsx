@@ -8,12 +8,13 @@ import {
 } from "@stripe/react-stripe-js";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 
-const CheckoutPage = ({ amount }: { amount: number }) => {
+const CheckoutPage = ({ amount, currency }: { amount: number; currency: "usd" | "php" }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(false);
+  const currencySymbol = currency === 'php' ? 'P' : '$';
 
   useEffect(() => {
     fetch("/api/create-payment-intent", {
@@ -21,11 +22,11 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount: convertToSubcurrency(amount) }),
+      body: JSON.stringify({ amount: convertToSubcurrency(amount), currency }),
     })
       .then((res) => res.json())
       .then((data) => setClientSecret(data.clientSecret));
-  }, [amount]);
+  }, [amount, currency]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,7 +89,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         disabled={!stripe || loading}
         className="text-white w-full p-5 bg-black mt-2 rounded-md font-bold disabled:opacity-50 disabled:animate-pulse"
       >
-        {!loading ? `Pay $${amount}` : "Processing..."}
+        {!loading ? `Pay ${currencySymbol}${amount}` : "Processing..."}
       </button>
     </form>
   );

@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 interface CheckoutButtonProps {
   amount: number;
   productName?: string;
+  currency?: 'USD' | 'PHP';
 }
 
-export default function CheckoutButton({ amount, productName = "Product" }: CheckoutButtonProps) {
+export default function CheckoutButton({ amount, productName = "Product", currency = "USD" }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -20,6 +21,7 @@ export default function CheckoutButton({ amount, productName = "Product" }: Chec
       const searchParams = new URLSearchParams({
         amount: amount.toString(),
         name: productName,
+        currency: currency.toLowerCase(),
       });
       
       router.push(`/payment?${searchParams.toString()}`);
@@ -32,13 +34,15 @@ export default function CheckoutButton({ amount, productName = "Product" }: Chec
     }
   };
 
+  const currencySymbol = currency === 'PHP' ? '₱' : '$';
+
   return (
     <button
       onClick={handleCheckout}
       disabled={loading}
       className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
     >
-      {loading ? 'Loading...' : `Buy Now - $${amount}`}
+      {loading ? 'Loading...' : `Buy Now - ${currencySymbol}${amount}`}
     </button>
   );
 }

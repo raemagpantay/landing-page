@@ -129,6 +129,7 @@ export default function GameShowcase() {
 
       {/* Hero Section with parallax and animated glow */}
       <section
+        id="download"
         className="min-h-screen bg-cover bg-center text-white px-6 py-20 flex flex-col items-center text-center relative overflow-hidden"
         style={{ backgroundImage: "url('/images/TrashArt-bg.jpg')" }}
       >
@@ -363,7 +364,7 @@ export default function GameShowcase() {
             transition={{ type: 'spring', stiffness: 200 }}
           >
             <Image
-              src="/images/screenshot1.jpg"
+              src="/images/trash art.jpg"
               alt="Environmental Cleanup Gameplay"
               className="w-full h-full object-cover"
               width={1920}
@@ -388,7 +389,7 @@ export default function GameShowcase() {
             transition={{ type: 'spring', stiffness: 200 }}
           >
             <Image
-              src="/images/screenshot4.jpg"
+              src="/images/Salvage_Protocol_bg.png"
               alt="Waste Segregation Interface"
               className="w-full h-full object-cover"
               width={1920}
@@ -491,7 +492,7 @@ export default function GameShowcase() {
           </motion.p>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            {/* Basic Package */}
+            {/* Download Demo */}
             <motion.div
               className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700"
               initial={{ opacity: 0, y: 20 }}
@@ -499,17 +500,25 @@ export default function GameShowcase() {
               transition={{ duration: 0.8, delay: 0.6 }}
               viewport={{ once: true }}
             >
-              <h4 className="text-2xl font-bold mb-4 text-blue-400">Basic Package</h4>
-              <div className="text-3xl font-bold mb-4">$9.99</div>
+              <h4 className="text-2xl font-bold mb-4 text-blue-400">Download Demo</h4>
+              <div className="text-3xl font-bold mb-4">FREE</div>
               <ul className="text-left text-gray-300 mb-6 space-y-2">
-                <li>✓ Full game access</li>
+                <li>✓ Demo game access</li>
                 <li>✓ Basic support</li>
-                <li>✓ Regular updates</li>
+                <li>✓ Try before you buy</li>
               </ul>
-              <CheckoutButton amount={9.99} productName="Basic Package" />
+              <button
+                onClick={() => {
+                  const downloadSection = document.getElementById('download');
+                  downloadSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+              >
+                Download Now
+              </button>
             </motion.div>
 
-            {/* Premium Package */}
+            {/* Buy Salvage Protocol */}
             <motion.div
               className="bg-gradient-to-b from-purple-800/50 to-blue-800/50 backdrop-blur-sm rounded-xl p-8 border border-purple-500 relative"
               initial={{ opacity: 0, y: 20 }}
@@ -520,16 +529,16 @@ export default function GameShowcase() {
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold">
                 POPULAR
               </div>
-              <h4 className="text-2xl font-bold mb-4 text-purple-400">Premium Package</h4>
-              <div className="text-3xl font-bold mb-4">$19.99</div>
+              <h4 className="text-2xl font-bold mb-4 text-purple-400">Buy Salvage Protocol</h4>
+              <div className="text-3xl font-bold mb-4">₱150</div>
               <ul className="text-left text-gray-300 mb-6 space-y-2">
-                <li>✓ Everything in Basic</li>
+                <li>✓ Full game access</li>
                 <li>✓ Early access to content</li>
                 <li>✓ Priority support</li>
                 <li>✓ Exclusive in-game items</li>
                 <li>✓ Developer insights</li>
               </ul>
-              <CheckoutButton amount={19.99} productName="Premium Package" />
+              <CheckoutButton amount={150} productName="Buy Salvage Protocol" currency="PHP" />
             </motion.div>
           </div>
         </div>
