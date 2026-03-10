@@ -25,10 +25,11 @@ export async function POST(request: NextRequest) {
       message: `Admin status ${isAdmin ? 'granted' : 'revoked'} for ${email}`,
       uid: userRecord.uid
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to set admin status';
     console.error('Error setting admin status:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to set admin status' },
+      { error: message },
       { status: 500 }
     );
   }
