@@ -19,8 +19,18 @@ function SignUp() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
-  const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
+  const [createUserWithEmailAndPassword, , , signUpError] = useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
+
+  const getDetailedErrorMessage = (err) => {
+    if (!err) {
+      return 'Sign-up failed: Firebase did not return a user credential.';
+    }
+
+    const code = err.code || 'unknown';
+    const message = err.message || 'No additional details provided.';
+    return `Sign-up failed (${code}): ${message}`;
+  };
 
   const getAgeFromBirthDate = (dateString) => {
     const today = new Date();
@@ -94,7 +104,11 @@ function SignUp() {
       console.log('Creating user account...');
       const res = await createUserWithEmailAndPassword(email, password);
       if (!res) {
-        setError('An error occurred. Please try again.');
+        if (signUpError) {
+          setError(getSignUpErrorMessage(signUpError.code, signUpError.message));
+        } else {
+          setError(getDetailedErrorMessage(null));
+        }
         setIsLoading(false);
         return;
       }
@@ -129,8 +143,7 @@ function SignUp() {
       console.log('Sign-up process completed successfully');
     } catch (e) {
       console.error('Sign-up error:', e);
-
-      setError(getSignUpErrorMessage(e.code, e.message));
+      setError(getSignUpErrorMessage(e?.code, e?.message || getDetailedErrorMessage(e)));
     } finally {
       setIsLoading(false);
     }
