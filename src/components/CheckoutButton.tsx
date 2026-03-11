@@ -22,6 +22,7 @@ export default function CheckoutButton({ amount, productName = "Product", curren
         amount: amount.toString(),
         name: productName,
         currency: currency.toLowerCase(),
+        walletTest: "1",
       });
       
       router.push(`/payment?${searchParams.toString()}`);

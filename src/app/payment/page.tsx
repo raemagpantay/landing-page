@@ -20,12 +20,14 @@ function PaymentContent() {
   const [amount, setAmount] = useState<number>(0);
   const [productName, setProductName] = useState<string>("");
   const [currency, setCurrency] = useState<"usd" | "php">("usd");
+  const [walletTestMode, setWalletTestMode] = useState<boolean>(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const amountParam = searchParams.get('amount');
     const nameParam = searchParams.get('name');
     const currencyParam = searchParams.get('currency');
+    const walletTestParam = searchParams.get('walletTest');
     
     if (amountParam) {
       setAmount(parseFloat(amountParam));
@@ -36,6 +38,7 @@ function PaymentContent() {
     if (currencyParam === 'php' || currencyParam === 'usd') {
       setCurrency(currencyParam);
     }
+    setWalletTestMode(walletTestParam === '1');
   }, [searchParams]);
 
   const currencySymbol = currency === 'php' ? 'P' : '$';
@@ -71,12 +74,18 @@ function PaymentContent() {
 
   return (
     <main className="max-w-6xl mx-auto p-10 text-white text-center border m-10 rounded-md bg-gradient-to-tr from-blue-500 to-purple-500">
-      <div className="mb-10">
+      <div className="mb-8">
+        <p className="uppercase tracking-[0.2em] text-xs font-semibold text-blue-100 mb-3">
+          Secure Checkout
+        </p>
         <h1 className="text-4xl font-extrabold mb-2">Complete Your Purchase</h1>
-        <h2 className="text-2xl">
+        <h2 className="text-2xl mb-4">
           {productName && `${productName} - `}
           <span className="font-bold">{currencySymbol}{amount}</span>
         </h2>
+        <p className="text-sm text-blue-100 max-w-2xl mx-auto">
+          This page supports instant wallet checkout when available, plus standard card/payment options.
+        </p>
       </div>
 
       <Elements
@@ -87,7 +96,7 @@ function PaymentContent() {
           currency,
         }}
       >
-        <CheckoutPage amount={amount} currency={currency} />
+        <CheckoutPage amount={amount} currency={currency} walletTestMode={walletTestMode} />
       </Elements>
     </main>
   );

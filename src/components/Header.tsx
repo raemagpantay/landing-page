@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Track if the user is signed in
+  const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState(''); // Store the user's email
   const [dropdownOpen, setDropdownOpen] = useState(false); // State for dropdown visibility
   const [imageError, setImageError] = useState(false); // Track image loading errors
@@ -16,13 +17,34 @@ export default function Header() {
 
   useEffect(() => {
     // Listen for authentication state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsSignedIn(true);
         setUserEmail(user.email || '');
         sessionStorage.setItem('userEmail', user.email || '');
+
+        try {
+          const res = await fetch('/api/check-admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ uid: user.uid }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            setIsAdmin(data.isAdmin === true);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+        }
       } else {
         setIsSignedIn(false);
+        setIsAdmin(false);
         setUserEmail('');
         sessionStorage.removeItem('userEmail');
       }
@@ -179,6 +201,24 @@ export default function Header() {
 
                       {/* Menu Items */}
                       <ul className="py-2" aria-labelledby="user-menu-button">
+                        {isAdmin && (
+                          <li>
+                            <Link
+                              href="/Admin"
+                              className="flex items-center px-4 py-3 text-sm text-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-600 dark:text-cyan-300 dark:hover:text-white transition-colors"
+                              onClick={() => setDropdownOpen(false)}
+                            >
+                              <svg
+                                className="w-4 h-4 mr-3"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M10 2a1 1 0 01.894.553l1.382 2.764 3.053.443a1 1 0 01.554 1.706l-2.21 2.154.522 3.043a1 1 0 01-1.45 1.054L10 12.347l-2.729 1.435a1 1 0 01-1.45-1.054l.521-3.043-2.21-2.154a1 1 0 01.554-1.706l3.053-.443 1.382-2.764A1 1 0 0110 2z" />
+                              </svg>
+                              Admin Dashboard
+                            </Link>
+                          </li>
+                        )}
                         <li>
                           <Link
                             href="/profile"

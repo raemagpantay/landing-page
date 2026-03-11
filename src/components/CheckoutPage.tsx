@@ -4,16 +4,18 @@ import React, { useEffect, useState } from "react";
 import {
   useStripe,
   useElements,
+  ExpressCheckoutElement,
   PaymentElement,
 } from "@stripe/react-stripe-js";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 
-const CheckoutPage = ({ amount, currency }: { amount: number; currency: "usd" | "php" }) => {
+const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: number; currency: "usd" | "php"; walletTestMode?: boolean }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(false);
+  const [walletReady, setWalletReady] = useState(false);
   const currencySymbol = currency === 'php' ? 'P' : '$';
 
   useEffect(() => {
@@ -22,17 +24,27 @@ const CheckoutPage = ({ amount, currency }: { amount: number; currency: "usd" | 
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount: convertToSubcurrency(amount), currency }),
+      body: JSON.stringify({ amount: convertToSubcurrency(amount), currency, walletTestMode }),
     })
-      .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret));
-  }, [amount, currency]);
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Unable to initialize payment.");
+        }
+        setClientSecret(data.clientSecret);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : "Unable to initialize payment.";
+        setErrorMessage(message);
+      });
+  }, [amount, currency, walletTestMode]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
 
     if (!stripe || !elements) {
+      setLoading(false);
       return;
     }
 
@@ -80,17 +92,63 @@ const CheckoutPage = ({ amount, currency }: { amount: number; currency: "usd" | 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-2 rounded-md">
-      {clientSecret && <PaymentElement />}
+    <form onSubmit={handleSubmit} className="bg-white p-5 rounded-lg shadow-lg text-left text-gray-900">
+      <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+        <p className="text-sm font-semibold text-emerald-800">Instant Pay</p>
+        <p className="text-xs text-emerald-700 mt-1">
+          If available on this device/browser, Google Pay appears below for one-tap checkout.
+        </p>
+      </div>
 
-      {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
+      {clientSecret && (
+        <div className="mb-4 rounded-md border border-gray-200 p-3">
+          <ExpressCheckoutElement
+            options={{
+              paymentMethods: {
+                applePay: "always",
+                googlePay: "always",
+              },
+            }}
+            onReady={() => setWalletReady(true)}
+          />
+          {!walletReady && (
+            <p className="mt-2 text-xs text-gray-500">
+              Wallet buttons only show when the browser supports them and an eligible wallet is configured.
+            </p>
+          )}
+        </div>
+      )}
+
+      <div className="mb-4">
+        <p className="text-sm font-semibold text-gray-700 mb-2">Other payment methods</p>
+        {clientSecret && (
+          <PaymentElement
+            options={{
+              layout: "tabs",
+              paymentMethodOrder: ["google_pay", "apple_pay", "link", "card"],
+            }}
+          />
+        )}
+      </div>
+
+      {walletTestMode && (
+        <p className="text-xs text-blue-700 mt-1">
+          Wallet test mode is enabled to maximize Google Pay visibility during testing.
+        </p>
+      )}
+
+      {errorMessage && <div className="text-red-600 text-sm mt-2">{errorMessage}</div>}
 
       <button
         disabled={!stripe || loading}
-        className="text-white w-full p-5 bg-black mt-2 rounded-md font-bold disabled:opacity-50 disabled:animate-pulse"
+        className="text-white w-full p-4 bg-black mt-2 rounded-md font-bold disabled:opacity-50 disabled:animate-pulse"
       >
-        {!loading ? `Pay ${currencySymbol}${amount}` : "Processing..."}
+        {!loading ? `Pay ${currencySymbol}${amount}` : "Processing payment..."}
       </button>
+
+      <p className="text-xs text-gray-500 mt-3 text-center">
+        Secure checkout powered by Stripe.
+      </p>
     </form>
   );
 };

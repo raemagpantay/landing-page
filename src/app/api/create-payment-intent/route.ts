@@ -14,8 +14,12 @@ export async function POST(request: NextRequest) {
       apiVersion: "2025-06-30.basil",
     });
 
-    const { amount, currency } = await request.json();
-    const selectedCurrency = currency === "php" ? "php" : "usd";
+    const { amount, currency, walletTestMode } = await request.json();
+    const selectedCurrency = walletTestMode
+      ? "usd"
+      : currency === "php"
+        ? "php"
+        : "usd";
 
     // Validate amount
     if (!amount || amount <= 0) {
@@ -25,13 +29,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    // Let Stripe dynamically choose all compatible payment methods
+    // (including wallets like Google Pay when available in browser/context).
+    const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
       amount: amount,
       currency: selectedCurrency,
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: {
+        enabled: true,
+      },
     });
 
-    return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+    return NextResponse.json({
+      clientSecret: paymentIntent.client_secret,
+      currency: selectedCurrency,
+      walletTestMode: Boolean(walletTestMode),
+    });
   } catch (error) {
     console.error("Internal Error:", error);
     // Handle other errors (e.g., network issues, parsing errors)

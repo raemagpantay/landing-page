@@ -12,6 +12,8 @@ function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [birthDate, setBirthDate] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
@@ -194,22 +196,42 @@ function SignUp() {
                 className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
                 disabled={isLoading}
               />
-              <input
-                type="password"
-                placeholder="Password (minimum 6 characters)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
-                disabled={isLoading}
-              />
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
-                disabled={isLoading}
-              />
+              <div className="relative mb-4">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password (minimum 6 characters)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 pr-24 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-0 px-3 text-sm text-indigo-300 hover:text-indigo-200"
+                  disabled={isLoading}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              <div className="relative mb-4">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full p-3 pr-24 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-0 px-3 text-sm text-indigo-300 hover:text-indigo-200"
+                  disabled={isLoading}
+                >
+                  {showConfirmPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
               <input
                 type="date"
                 value={birthDate}
