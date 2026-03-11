@@ -7,6 +7,7 @@ import {
   ExpressCheckoutElement,
   PaymentElement,
 } from "@stripe/react-stripe-js";
+import type { StripeExpressCheckoutElementConfirmEvent } from "@stripe/stripe-js";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 
 const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: number; currency: "usd" | "php"; walletTestMode?: boolean }) => {
@@ -76,6 +77,32 @@ const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: nu
     setLoading(false);
   };
 
+  const handleExpressCheckoutConfirm = async (
+    _event: StripeExpressCheckoutElementConfirmEvent
+  ) => {
+    if (!stripe || !elements || !clientSecret) {
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage(undefined);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      clientSecret,
+      confirmParams: {
+        return_url: `${window.location.origin}/payment-success?amount=${amount}`,
+      },
+    });
+
+    if (error) {
+      setErrorMessage(error.message);
+      setLoading(false);
+      return;
+    }
+
+  };
+
   if (!clientSecret || !stripe || !elements) {
     return (
       <div className="flex items-center justify-center">
@@ -109,6 +136,7 @@ const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: nu
                 googlePay: "always",
               },
             }}
+            onConfirm={handleExpressCheckoutConfirm}
             onReady={() => setWalletReady(true)}
           />
           {!walletReady && (
