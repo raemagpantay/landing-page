@@ -9,13 +9,16 @@ import {
 } from "@stripe/react-stripe-js";
 import type { StripeExpressCheckoutElementConfirmEvent } from "@stripe/stripe-js";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
+import { useRouter } from "next/navigation";
 
 const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: number; currency: "usd" | "php"; walletTestMode?: boolean }) => {
+  const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(false);
+  const [instantTestPayLoading, setInstantTestPayLoading] = useState(false);
   const [walletReady, setWalletReady] = useState(false);
   const currencySymbol = currency === 'php' ? 'P' : '$';
 
@@ -103,6 +106,38 @@ const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: nu
 
   };
 
+  const handleInstantTestPay = async () => {
+    setInstantTestPayLoading(true);
+    setErrorMessage(undefined);
+
+    try {
+      const response = await fetch("/api/test-instant-pay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: convertToSubcurrency(amount),
+          currency,
+          walletTestMode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Instant test payment failed.");
+      }
+
+      router.push(`/payment-success?amount=${amount}&download=paid`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Instant test payment failed.";
+      setErrorMessage(message);
+    } finally {
+      setInstantTestPayLoading(false);
+    }
+  };
+
   if (!clientSecret || !stripe || !elements) {
     return (
       <div className="flex items-center justify-center">
@@ -166,6 +201,15 @@ const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: nu
       )}
 
       {errorMessage && <div className="text-red-600 text-sm mt-2">{errorMessage}</div>}
+
+      <button
+        type="button"
+        onClick={handleInstantTestPay}
+        disabled={instantTestPayLoading || loading}
+        className="text-white w-full p-4 bg-emerald-600 mt-2 rounded-md font-bold hover:bg-emerald-500 disabled:opacity-50 disabled:animate-pulse"
+      >
+        {instantTestPayLoading ? "Running instant test payment..." : `Instant Test Card Pay ${currencySymbol}${amount}`}
+      </button>
 
       <button
         disabled={!stripe || loading}
