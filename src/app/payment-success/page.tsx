@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { auth } from '@/app/firebase/config';
 
 function PaymentSuccessContent() {
   const [amount, setAmount] = useState<string>('');
@@ -13,6 +14,7 @@ function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const amountParam = searchParams.get('amount');
   const shouldDownloadPaid = searchParams.get('download') === 'paid';
+  const paymentIntentId = searchParams.get('payment_intent');
 
   useEffect(() => {
     if (amountParam) {
@@ -65,6 +67,24 @@ function PaymentSuccessContent() {
 
     const fetchAndDownloadPaid = async () => {
       try {
+        const currentUser = auth.currentUser;
+        if (currentUser && paymentIntentId) {
+          const idToken = await currentUser.getIdToken();
+          const grantResponse = await fetch('/api/grant-paid-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ paymentIntentId }),
+          });
+
+          if (!grantResponse.ok) {
+            const grantData = await grantResponse.json();
+            console.warn('Unable to persist paid entitlement:', grantData?.error || 'unknown error');
+          }
+        }
+
         const res = await fetch('/api/current-file?version=paid');
         const data = await res.json();
 
@@ -99,7 +119,7 @@ function PaymentSuccessContent() {
       if (redirectTimer) clearTimeout(redirectTimer);
       if (countdownInterval) clearInterval(countdownInterval);
     };
-  }, [router, shouldDownloadPaid]);
+  }, [paymentIntentId, router, shouldDownloadPaid]);
 
   return (
     <main className="max-w-6xl mx-auto p-10 text-white text-center border m-10 rounded-md bg-gradient-to-tr from-blue-500 to-purple-500">

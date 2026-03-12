@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/app/firebase/config';
 
@@ -12,7 +12,61 @@ interface CheckoutButtonProps {
 
 export default function CheckoutButton({ amount, productName = "Product", currency = "USD" }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [hasPaidAccess, setHasPaidAccess] = useState(false);
+  const [checkingPaidAccess, setCheckingPaidAccess] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkPaidAccess = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        setHasPaidAccess(false);
+        return;
+      }
+
+      setCheckingPaidAccess(true);
+      try {
+        const idToken = await user.getIdToken();
+        const paidStatusRes = await fetch('/api/paid-status', {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+
+        if (!paidStatusRes.ok) {
+          setHasPaidAccess(false);
+          return;
+        }
+
+        const paidStatusData = await paidStatusRes.json();
+        setHasPaidAccess(paidStatusData.hasPaid === true);
+      } catch {
+        setHasPaidAccess(false);
+      } finally {
+        setCheckingPaidAccess(false);
+      }
+    };
+
+    checkPaidAccess();
+  }, []);
+
+  const downloadPaidFile = async () => {
+    const paidFileResponse = await fetch('/api/current-file?version=paid');
+    const paidFileData = await paidFileResponse.json();
+
+    if (!paidFileResponse.ok || !paidFileData.fileName) {
+      throw new Error('No paid game file is currently available. Please contact admin.');
+    }
+
+    const fileName = paidFileData.fileName as string;
+    const link = document.createElement('a');
+    link.href = `/uploads/${fileName}`;
+    link.download = fileName;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleCheckout = async () => {
     setLoading(true);
@@ -23,6 +77,21 @@ export default function CheckoutButton({ amount, productName = "Product", curren
       if (!user) {
         router.push('/sign-up');
         return;
+      }
+
+      const idToken = await user.getIdToken();
+      const paidStatusRes = await fetch('/api/paid-status', {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
+      if (paidStatusRes.ok) {
+        const paidStatusData = await paidStatusRes.json();
+        if (paidStatusData.hasPaid === true) {
+          await downloadPaidFile();
+          return;
+        }
       }
 
       // Redirect to payment page with amount and product name
@@ -48,10 +117,16 @@ export default function CheckoutButton({ amount, productName = "Product", curren
   return (
     <button
       onClick={handleCheckout}
-      disabled={loading}
-      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+      disabled={loading || checkingPaidAccess}
+      className={`${hasPaidAccess ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50`}
     >
-      {loading ? 'Loading...' : `Buy Now - ${currencySymbol}${amount}`}
+      {loading
+        ? 'Loading...'
+        : checkingPaidAccess
+          ? 'Checking purchase...'
+          : hasPaidAccess
+            ? 'Owned - Download Paid Version'
+            : `Buy Now - ${currencySymbol}${amount}`}
     </button>
   );
 }

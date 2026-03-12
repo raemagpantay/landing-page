@@ -129,7 +129,9 @@ const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: nu
         throw new Error(data?.error || "Instant test payment failed.");
       }
 
-      router.push(`/payment-success?amount=${amount}&download=paid`);
+      const paymentIntentId = data?.paymentIntentId;
+      const paymentIntentQuery = paymentIntentId ? `&payment_intent=${paymentIntentId}` : "";
+      router.push(`/payment-success?amount=${amount}&download=paid${paymentIntentQuery}`);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Instant test payment failed.";
       setErrorMessage(message);

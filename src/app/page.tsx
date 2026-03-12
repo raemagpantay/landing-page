@@ -150,7 +150,7 @@ export default function GameShowcase() {
                   letterSpacing: '2px',
                 }}
               >
-                {"Sign In to Download".split("").map((char, i) => (
+                {"Sign In to Try Demo".split("").map((char, i) => (
                   <span
                     key={i}
                     className="inline-block"
@@ -186,7 +186,7 @@ export default function GameShowcase() {
                 tabIndex={demoFile ? 0 : -1}
                 aria-disabled={!demoFile}
               >
-                {"Download Now".split("").map((char, i) => (
+                {"Try Demo".split("").map((char, i) => (
                   <span
                     key={i}
                     className="inline-block"
@@ -204,6 +204,10 @@ export default function GameShowcase() {
                 ))}
               </a>
             )}
+
+            <p className="mt-4 text-xs text-cyan-200 font-medium">
+              Homepage download is the Demo version. Paid version is unlocked from the Premium section.
+            </p>
           </motion.div>
         </motion.div>
       </section>
