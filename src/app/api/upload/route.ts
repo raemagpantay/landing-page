@@ -5,6 +5,54 @@ import path from 'path';
 
 // Directory where zip files are stored
 const uploadsDir = path.join(process.cwd(), 'public/uploads');
+const metadataPath = path.join(uploadsDir, 'metadata.json');
+
+type FileVersion = 'demo' | 'paid';
+
+type UploadMetadata = {
+  currentFile: string | null;
+  demoFile: string | null;
+  paidFile: string | null;
+};
+
+function normalizeMetadata(raw: unknown): UploadMetadata {
+  const data = (raw || {}) as {
+    currentFile?: string | null;
+    demoFile?: string | null;
+    paidFile?: string | null;
+  };
+
+  const demoFile = data.demoFile ?? data.currentFile ?? null;
+  const paidFile = data.paidFile ?? null;
+
+  return {
+    currentFile: demoFile,
+    demoFile,
+    paidFile,
+  };
+}
+
+function readMetadata(): UploadMetadata {
+  if (!fs.existsSync(metadataPath)) {
+    const initial: UploadMetadata = { currentFile: null, demoFile: null, paidFile: null };
+    fs.writeFileSync(metadataPath, JSON.stringify(initial));
+    return initial;
+  }
+
+  const parsed = JSON.parse(fs.readFileSync(metadataPath, 'utf-8')) as unknown;
+  const normalized = normalizeMetadata(parsed);
+  fs.writeFileSync(metadataPath, JSON.stringify(normalized));
+  return normalized;
+}
+
+function writeMetadata(metadata: UploadMetadata) {
+  fs.writeFileSync(metadataPath, JSON.stringify(metadata));
+}
+
+function buildStoredFileName(originalName: string, version: FileVersion): string {
+  const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
+  return `${version}-${Date.now()}-${safeName}`;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +63,8 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const zipFile = formData.get('zip') as File;
+  const requestedVersion = formData.get('version');
+  const version: FileVersion = requestedVersion === 'paid' ? 'paid' : 'demo';
 
     if (!zipFile) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -25,8 +75,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Only ZIP files are allowed' }, { status: 400 });
     }
 
-    // Generate a timestamp-based filename to avoid conflicts
-    const fileName = `${zipFile.name}`;
+    // Generate a version-tagged filename to keep demo and paid files independent.
+    const fileName = buildStoredFileName(zipFile.name, version);
     const filePath = path.join(uploadsDir, fileName);
 
     // Convert the file to an array buffer and save it
@@ -34,13 +84,32 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     await writeFile(filePath, buffer);
 
-    // Save metadata about the current file
-    const metadataPath = path.join(uploadsDir, 'metadata.json');
-    fs.writeFileSync(metadataPath, JSON.stringify({ currentFile: fileName }));
+    const metadata = readMetadata();
+    const previousFile = version === 'paid' ? metadata.paidFile : metadata.demoFile;
+
+    // Replace old file in the same version slot if it exists.
+    if (previousFile && previousFile !== fileName) {
+      const previousPath = path.join(uploadsDir, previousFile);
+      if (fs.existsSync(previousPath)) {
+        fs.unlinkSync(previousPath);
+      }
+    }
+
+    const updatedMetadata: UploadMetadata = {
+      ...metadata,
+      currentFile: version === 'demo' ? fileName : metadata.demoFile,
+      demoFile: version === 'demo' ? fileName : metadata.demoFile,
+      paidFile: version === 'paid' ? fileName : metadata.paidFile,
+    };
+
+    writeMetadata(updatedMetadata);
 
     return NextResponse.json({ 
       success: true,
       fileName: fileName,
+      version,
+      demoFile: updatedMetadata.demoFile,
+      paidFile: updatedMetadata.paidFile,
       message: 'File uploaded successfully' 
     }, { status: 200 });
   } catch (error) {

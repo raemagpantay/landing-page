@@ -61,7 +61,7 @@ const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: nu
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}/payment-success?amount=${amount}`,
+        return_url: `${window.location.origin}/payment-success?amount=${amount}&download=paid`,
       },
     });
 
@@ -91,7 +91,7 @@ const CheckoutPage = ({ amount, currency, walletTestMode = false }: { amount: nu
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}/payment-success?amount=${amount}`,
+        return_url: `${window.location.origin}/payment-success?amount=${amount}&download=paid`,
       },
     });
 

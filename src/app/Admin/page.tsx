@@ -14,32 +14,37 @@ interface User {
 
 export default function AdminDashboard() {
   const [file, setFile] = useState<File | null>(null);
+  const [uploadVersion, setUploadVersion] = useState<'demo' | 'paid'>('demo');
   const [status, setStatus] = useState('');
-  const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const [demoFile, setDemoFile] = useState<string | null>(null);
+  const [paidFile, setPaidFile] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState<string | null>(null);
   const [archivingUserId, setArchivingUserId] = useState<string | null>(null);
   const router = useRouter();
 
-  // Fetch the current ZIP file name on component mount
+  // Fetch current demo and paid ZIP files on component mount
   useEffect(() => {
-    const fetchCurrentFile = async () => {
+    const fetchCurrentFiles = async () => {
       try {
         const res = await fetch('/api/current-file');
         if (res.ok) {
           const data = await res.json();
-          setCurrentFile(data.fileName || null);
+          setDemoFile(data.demoFile || null);
+          setPaidFile(data.paidFile || null);
         } else {
-          setCurrentFile(null);
+          setDemoFile(null);
+          setPaidFile(null);
         }
       } catch (error) {
         console.error('Error fetching current file:', error);
-        setCurrentFile(null);
+        setDemoFile(null);
+        setPaidFile(null);
       }
     };
 
-    fetchCurrentFile();
+    fetchCurrentFiles();
   }, []);
 
   // Fetch registered users from Firebase
@@ -108,23 +113,25 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (version: 'demo' | 'paid') => {
     try {
-      setStatus('Deleting file...');
+      setStatus(`Deleting ${version} file...`);
       const deleteRes = await fetch('/api/Delete', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fileName: currentFile }),
+        body: JSON.stringify({ version }),
       });
   
       if (deleteRes.ok) {
-        setCurrentFile(null);
-        setStatus('✅ File deleted successfully.');
+        const data = await deleteRes.json();
+        setDemoFile(data.demoFile || null);
+        setPaidFile(data.paidFile || null);
+        setStatus(`✅ ${version === 'demo' ? 'Demo' : 'Paid'} file deleted successfully.`);
       } else {
         const errorData = await deleteRes.json();
-        setStatus(`❌ Failed to delete the file: ${errorData.error}`);
+        setStatus(`❌ Failed to delete the ${version} file: ${errorData.error}`);
       }
     } catch (error) {
       console.error('Error deleting file:', error);
@@ -140,9 +147,10 @@ export default function AdminDashboard() {
     }
   
     try {
-      setStatus('Uploading file...');
+      setStatus(`Uploading ${uploadVersion} file...`);
       const formData = new FormData();
       formData.append('zip', file);
+      formData.append('version', uploadVersion);
   
       const uploadRes = await fetch('/api/upload', {
         method: 'POST',
@@ -151,8 +159,9 @@ export default function AdminDashboard() {
   
       if (uploadRes.ok) {
         const data = await uploadRes.json();
-        setCurrentFile(data.fileName || null);
-        setStatus('✅ Upload successful!');
+        setDemoFile(data.demoFile || null);
+        setPaidFile(data.paidFile || null);
+        setStatus(`✅ ${uploadVersion === 'demo' ? 'Demo' : 'Paid'} upload successful!`);
       } else {
         setStatus('❌ Upload failed.');
       }
@@ -186,22 +195,31 @@ export default function AdminDashboard() {
         {/* File Management Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <div>
-            {currentFile ? (
-              <div className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 mb-6">
-                <h2 className="text-xl font-semibold">Current ZIP File:</h2>
-                <p className="text-lg mt-2">{currentFile}</p>
+            <div className="grid grid-cols-1 gap-4 mb-6">
+              <div className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
+                <h2 className="text-xl font-semibold text-blue-300">Current Demo ZIP</h2>
+                <p className="text-sm mt-2 break-all">{demoFile || 'No demo file uploaded.'}</p>
                 <button
-                  onClick={handleDelete}
-                  className="mt-4 bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg font-medium transition"
+                  onClick={() => handleDelete('demo')}
+                  disabled={!demoFile}
+                  className="mt-4 bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Delete Current File
+                  Delete Demo File
                 </button>
               </div>
-            ) : (
-              <div className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 mb-6">
-                <h2 className="text-xl font-semibold">No ZIP file currently uploaded.</h2>
+
+              <div className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
+                <h2 className="text-xl font-semibold text-purple-300">Current Paid ZIP</h2>
+                <p className="text-sm mt-2 break-all">{paidFile || 'No paid file uploaded.'}</p>
+                <button
+                  onClick={() => handleDelete('paid')}
+                  disabled={!paidFile}
+                  className="mt-4 bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Delete Paid File
+                </button>
               </div>
-            )}
+            </div>
 
             <form
               onSubmit={handleUpload}
@@ -209,10 +227,20 @@ export default function AdminDashboard() {
             >
               <h2 className="text-2xl font-semibold mb-4">Upload a ZIP File</h2>
               <p className="text-sm text-gray-400 mb-4">
-                {currentFile ? 
-                  "⚠️ Uploading a new file will replace the current file." : 
-                  "No file currently exists. Ready to upload."}
+                Upload a demo or paid ZIP. Uploading to the same type replaces the previous file.
               </p>
+              <label htmlFor="uploadVersion" className="block text-sm font-medium text-gray-400 mb-2">
+                File type:
+              </label>
+              <select
+                id="uploadVersion"
+                value={uploadVersion}
+                onChange={(e) => setUploadVersion(e.target.value === 'paid' ? 'paid' : 'demo')}
+                className="block w-full mb-4 p-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
+              >
+                <option value="demo">Demo Version</option>
+                <option value="paid">Paid Version</option>
+              </select>
               <label htmlFor="zipFile" className="block text-sm font-medium text-gray-400 mb-2">
                 Select a ZIP file to upload:
               </label>

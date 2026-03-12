@@ -30,18 +30,18 @@ function useParallax(offset = 30) {
 }
 
 export default function GameShowcase() {
-  const [currentFile, setCurrentFile] = useState<string | null>(null);
+  const [demoFile, setDemoFile] = useState<string | null>(null);
   const [user] = useAuthState(auth);
   const router = useRouter();
 
-  // Fetch the current ZIP file name on component mount
+  // Fetch the current demo ZIP file name on component mount
   useEffect(() => {
     const fetchCurrentFile = async () => {
       try {
-        const res = await fetch('/api/current-file');
+        const res = await fetch('/api/current-file?version=demo');
         if (res.ok) {
           const data = await res.json();
-          setCurrentFile(data.fileName || null);
+          setDemoFile(data.fileName || null);
         }
       } catch (error) {
         console.error('Error fetching current file:', error);
@@ -169,10 +169,10 @@ export default function GameShowcase() {
               </button>
             ) : (
               <a
-                href={currentFile ? `/uploads/${currentFile}` : "#"}
+                href={demoFile ? `/uploads/${demoFile}` : "#"}
                 download
                 className={`restart-btn relative -rotate-6 w-64 h-16 flex items-center justify-center text-2xl font-bold uppercase tracking-widest border-4 border-cyan-400 rounded-full bg-transparent select-none transition-all duration-200 hover:bg-cyan-400/10 hover:scale-105 active:scale-95 ${
-                  currentFile
+                  demoFile
                     ? "cursor-pointer"
                     : "opacity-60 cursor-not-allowed"
                 }`}
@@ -183,8 +183,8 @@ export default function GameShowcase() {
                   opacity: 1,
                   letterSpacing: '2px',
                 }}
-                tabIndex={currentFile ? 0 : -1}
-                aria-disabled={!currentFile}
+                tabIndex={demoFile ? 0 : -1}
+                aria-disabled={!demoFile}
               >
                 {"Download Now".split("").map((char, i) => (
                   <span
