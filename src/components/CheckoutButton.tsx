@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { auth } from '@/app/firebase/config';
 
 interface CheckoutButtonProps {
   amount: number;
@@ -17,6 +18,13 @@ export default function CheckoutButton({ amount, productName = "Product", curren
     setLoading(true);
     
     try {
+      const user = auth.currentUser;
+
+      if (!user) {
+        router.push('/sign-up');
+        return;
+      }
+
       // Redirect to payment page with amount and product name
       const searchParams = new URLSearchParams({
         amount: amount.toString(),
