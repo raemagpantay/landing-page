@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/app/firebase/config';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 interface CheckoutButtonProps {
   amount: number;
@@ -17,8 +18,7 @@ export default function CheckoutButton({ amount, productName = "Product", curren
   const router = useRouter();
 
   useEffect(() => {
-    const checkPaidAccess = async () => {
-      const user = auth.currentUser;
+    const checkPaidAccess = async (user: User | null) => {
       if (!user) {
         setHasPaidAccess(false);
         return;
@@ -47,7 +47,11 @@ export default function CheckoutButton({ amount, productName = "Product", curren
       }
     };
 
-    checkPaidAccess();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      checkPaidAccess(user);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const downloadPaidFile = async () => {
