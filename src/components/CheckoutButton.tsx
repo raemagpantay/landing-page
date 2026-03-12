@@ -64,7 +64,7 @@ export default function CheckoutButton({ amount, productName = "Product", curren
 
     const fileName = paidFileData.fileName as string;
     const link = document.createElement('a');
-    link.href = `/uploads/${fileName}`;
+    link.href = '/api/download?version=paid';
     link.download = fileName;
     link.rel = 'noopener';
     document.body.appendChild(link);

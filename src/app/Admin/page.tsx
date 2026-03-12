@@ -163,7 +163,8 @@ export default function AdminDashboard() {
         setPaidFile(data.paidFile || null);
         setStatus(`✅ ${uploadVersion === 'demo' ? 'Demo' : 'Paid'} upload successful!`);
       } else {
-        setStatus('❌ Upload failed.');
+        const errorData = await uploadRes.json().catch(() => ({}));
+        setStatus(`❌ Upload failed: ${errorData.error || 'Unknown error'}`);
       }
     } catch {
       setStatus('❌ An error occurred during the upload process.');

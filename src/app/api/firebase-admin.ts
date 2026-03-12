@@ -1,5 +1,13 @@
 import * as admin from 'firebase-admin';
 
+function resolveStorageBucket(projectId?: string) {
+  return (
+    process.env.FIREBASE_STORAGE_BUCKET ||
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    (projectId ? `${projectId}.appspot.com` : undefined)
+  );
+}
+
 function ensureAdminInitialized() {
   if (admin.apps.length) {
     return;
@@ -10,6 +18,7 @@ function ensureAdminInitialized() {
     : undefined;
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const storageBucket = resolveStorageBucket(projectId);
 
   if (!projectId) {
     throw new Error('FIREBASE_PROJECT_ID is not set in environment variables');
@@ -27,6 +36,7 @@ function ensureAdminInitialized() {
       clientEmail,
       privateKey,
     }),
+    storageBucket,
   });
 }
 
@@ -34,6 +44,10 @@ const adminAuth = {
   auth() {
     ensureAdminInitialized();
     return admin.auth();
+  },
+  storage() {
+    ensureAdminInitialized();
+    return admin.storage();
   },
 };
 

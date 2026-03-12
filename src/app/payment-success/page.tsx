@@ -94,7 +94,7 @@ function PaymentSuccessContent() {
         }
 
         const fileName = data.fileName as string;
-        const downloadUrl = `/uploads/${fileName}`;
+        const downloadUrl = '/api/download?version=paid';
 
         setPaidFile(fileName);
         setDownloadMessage('Your paid version download should start automatically. Redirecting to home page shortly...');
@@ -140,7 +140,7 @@ function PaymentSuccessContent() {
 
         {paidFile && (
           <a
-            href={`/uploads/${paidFile}`}
+            href="/api/download?version=paid"
             download
             className="inline-block mt-4 bg-white text-purple-700 font-semibold px-5 py-2 rounded-md hover:bg-purple-100 transition"
           >

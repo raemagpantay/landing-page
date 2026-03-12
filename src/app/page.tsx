@@ -169,7 +169,7 @@ export default function GameShowcase() {
               </button>
             ) : (
               <a
-                href={demoFile ? `/uploads/${demoFile}` : "#"}
+                href={demoFile ? '/api/download?version=demo' : "#"}
                 download
                 className={`restart-btn relative -rotate-6 w-64 h-16 flex items-center justify-center text-2xl font-bold uppercase tracking-widest border-4 border-cyan-400 rounded-full bg-transparent select-none transition-all duration-200 hover:bg-cyan-400/10 hover:scale-105 active:scale-95 ${
                   demoFile
