@@ -1,5 +1,5 @@
 export const DEMO_GDRIVE_URL =
-  'https://drive.google.com/uc?export=download&id=1FGmdJm6tNJ2elEs-2Zbr8FdnHwCScx1b';
+  'https://drive.google.com/uc?export=download&id=1OLMMvIXFuWfu74t_UC1Won_EQe_YeUeF';
 
 export const PAID_GDRIVE_URL =
   'https://drive.google.com/uc?export=download&id=1FGmdJm6tNJ2elEs-2Zbr8FdnHwCScx1b';
